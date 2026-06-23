@@ -1,0 +1,30 @@
+@if (errore()) {
+  <div class="dettaglio-page" role="alert">
+    <a class="back-link" routerLink="/notizie" aria-label="Torna alle notizie">← Notizie</a>
+    <p class="errore-msg">Notizia non trovata.</p>
+  </div>
+} @else if (notizia(); as n) {
+  <article class="dettaglio-page">
+    <a class="back-link" routerLink="/notizie" aria-label="Torna alle notizie">← Notizie</a>
+
+    @if (n.coverImageUrl) {
+      <img class="cover" [src]="n.coverImageUrl" [alt]="n.title" />
+    }
+
+    <header class="dettaglio-header">
+      <span class="notizia-tag" [class]="'tag-' + n.tag.toLowerCase()">{{ n.tag }}</span>
+      <time class="notizia-data" [attr.datetime]="n.publishedAt">
+        {{ n.publishedAt | date: 'dd MMMM yyyy, HH:mm' }}
+      </time>
+    </header>
+
+    <h1 class="dettaglio-titolo">{{ n.title }}</h1>
+
+    <div class="dettaglio-body" [innerHTML]="n.body" aria-label="Contenuto notizia"></div>
+  </article>
+} @else {
+  <div class="dettaglio-page dettaglio-loading" aria-busy="true" aria-live="polite">
+    <a class="back-link" routerLink="/notizie" aria-label="Torna alle notizie">← Notizie</a>
+    <p class="loading-msg">Caricamento...</p>
+  </div>
+}

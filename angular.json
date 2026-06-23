@@ -64,7 +64,8 @@
               "buildTarget": "ganaceto-frontend:build:production"
             },
             "development": {
-              "buildTarget": "ganaceto-frontend:build:development"
+              "buildTarget": "ganaceto-frontend:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

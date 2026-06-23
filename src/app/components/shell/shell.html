@@ -1,0 +1,32 @@
+<div class="app-container">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-logo">G</div>
+    <div class="header-text">
+      <span class="header-title">Insieme per Ganaceto</span>
+      <span class="header-sub">Comunità · Casina · Iniziative</span>
+    </div>
+    <button class="profile-btn" (click)="openProfilo()">
+      <span class="profile-icon">👤</span>
+    </button>
+  </header>
+
+  <!-- Contenuto pagina -->
+  <main class="app-main">
+    <router-outlet />
+  </main>
+
+  <!-- Tab bar in fondo -->
+  <nav class="tab-bar">
+    @for (tab of tabs; track tab.path) {
+      <a class="tab-item"
+         [routerLink]="tab.path"
+         routerLinkActive="active">
+        <span class="tab-icon">{{ tab.icon }}</span>
+        <span class="tab-label">{{ tab.label }}</span>
+      </a>
+    }
+  </nav>
+
+</div>

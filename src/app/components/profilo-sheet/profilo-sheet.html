@@ -1,0 +1,46 @@
+<div class="sheet-container">
+
+  @if (auth.isLoggedIn) {
+    <div class="profile-header">
+      <img
+        [src]="auth.user()!.profilePicture"
+        alt="Foto profilo"
+        class="avatar"
+        width="64"
+        height="64"
+        referrerpolicy="no-referrer"
+      />
+      <div class="profile-info">
+        <span class="display-name">{{ auth.user()!.displayName }}</span>
+        <span class="email">{{ auth.user()!.email }}</span>
+        @if (auth.isAdmin) {
+          <span class="role-badge">Admin</span>
+        }
+      </div>
+    </div>
+
+    @if (auth.isAdmin) {
+      <a class="admin-link" routerLink="/admin/notizie" (click)="close()">
+        ✏️ Gestisci notizie
+      </a>
+    }
+
+    <button class="logout-btn" (click)="logout()">Esci</button>
+
+  } @else {
+    <h2 class="sheet-title">Accedi</h2>
+    <p class="sheet-sub">Usa il tuo account Google per accedere e partecipare alla community.</p>
+
+    @if (error()) {
+      <p class="error-msg" role="alert">{{ error() }}</p>
+    }
+
+    @if (loading()) {
+      <p class="loading-msg">Accesso in corso…</p>
+    } @else {
+      <div #googleBtn class="google-btn-wrapper"></div>
+    }
+  }
+
+  <button class="close-btn" (click)="close()">Chiudi</button>
+</div>

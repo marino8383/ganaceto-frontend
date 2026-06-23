@@ -1,0 +1,108 @@
+<div class="bacheca-page">
+  <h1 class="page-title">Bacheca</h1>
+  <p class="page-sub">Messaggi e comunicazioni dalla community di Ganaceto.</p>
+
+  <!-- Form nuovo messaggio (solo utenti loggati) -->
+  @if (auth.isLoggedIn) {
+    @if (rispondendoA() === null) {
+      <section class="form-panel" aria-label="Scrivi un messaggio">
+        <form [formGroup]="form" (ngSubmit)="invia(null)" novalidate>
+          <div class="field">
+            <label for="testo-nuovo" class="sr-only">Scrivi un messaggio</label>
+            <textarea
+              id="testo-nuovo"
+              formControlName="testo"
+              rows="3"
+              maxlength="500"
+              placeholder="Scrivi un messaggio alla community…"
+              [attr.aria-invalid]="form.controls.testo.invalid && form.controls.testo.touched"
+            ></textarea>
+            <span class="char-count">{{ form.controls.testo.value.length }}/500</span>
+          </div>
+          @if (error()) {
+            <p class="form-error" role="alert">{{ error() }}</p>
+          }
+          <div class="form-actions">
+            <button class="btn-primary" type="submit" [disabled]="form.invalid || sending()">
+              {{ sending() ? 'Invio…' : 'Pubblica' }}
+            </button>
+          </div>
+        </form>
+      </section>
+    }
+  } @else {
+    <p class="login-prompt">
+      Accedi con Google per scrivere sulla bacheca.
+    </p>
+  }
+
+  <!-- Lista messaggi -->
+  @if (messaggi().length === 0) {
+    <p class="empty-state">Nessun messaggio ancora. Sii il primo a scrivere!</p>
+  }
+
+  <ul class="messaggi-list" aria-label="Messaggi bacheca">
+    @for (msg of messaggi(); track msg.id) {
+      <li class="messaggio-card">
+        <div class="messaggio-header">
+          <span class="autore">{{ msg.userDisplayName }}</span>
+          <time class="data" [attr.datetime]="msg.createdAt">
+            {{ msg.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+          </time>
+          @if (auth.isAdmin) {
+            <button class="btn-elimina" type="button" (click)="elimina(msg.id)" aria-label="Elimina messaggio">🗑</button>
+          }
+        </div>
+
+        <p class="messaggio-testo">{{ msg.testo }}</p>
+
+        <!-- Risposte -->
+        @if (msg.risposte.length > 0) {
+          <ul class="risposte-list" aria-label="Risposte">
+            @for (r of msg.risposte; track r.id) {
+              <li class="risposta-card">
+                <div class="messaggio-header">
+                  <span class="autore">{{ r.userDisplayName }}</span>
+                  <time class="data" [attr.datetime]="r.createdAt">
+                    {{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+                  </time>
+                  @if (auth.isAdmin) {
+                    <button class="btn-elimina" type="button" (click)="elimina(r.id)" aria-label="Elimina risposta">🗑</button>
+                  }
+                </div>
+                <p class="messaggio-testo">{{ r.testo }}</p>
+              </li>
+            }
+          </ul>
+        }
+
+        <!-- Form risposta inline -->
+        @if (auth.isLoggedIn) {
+          @if (rispondendoA() === msg.id) {
+            <form class="form-risposta" [formGroup]="form" (ngSubmit)="invia(msg.id)" novalidate>
+              <label [for]="'testo-risposta-' + msg.id" class="sr-only">Rispondi a {{ msg.userDisplayName }}</label>
+              <textarea
+                [id]="'testo-risposta-' + msg.id"
+                formControlName="testo"
+                rows="2"
+                maxlength="500"
+                placeholder="Scrivi una risposta…"
+              ></textarea>
+              @if (error()) {
+                <p class="form-error" role="alert">{{ error() }}</p>
+              }
+              <div class="form-actions">
+                <button class="btn-secondary" type="button" (click)="annullaRisposta()">Annulla</button>
+                <button class="btn-primary" type="submit" [disabled]="form.invalid || sending()">
+                  {{ sending() ? 'Invio…' : 'Rispondi' }}
+                </button>
+              </div>
+            </form>
+          } @else if (rispondendoA() === null) {
+            <button class="btn-rispondi" type="button" (click)="rispondi(msg.id)">Rispondi</button>
+          }
+        }
+      </li>
+    }
+  </ul>
+</div>

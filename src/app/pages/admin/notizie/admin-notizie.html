@@ -1,0 +1,94 @@
+<div class="admin-notizie">
+  <header class="admin-header">
+    <h1 class="admin-title">Gestione notizie</h1>
+    @if (formMode() === 'closed') {
+      <button class="btn-primary" type="button" (click)="openCreate()">+ Nuova notizia</button>
+    }
+  </header>
+
+  <!-- Form crea / modifica -->
+  @if (formMode() !== 'closed') {
+    <section class="form-panel" aria-label="Form notizia">
+      <h2 class="form-title">{{ formMode() === 'create' ? 'Nuova notizia' : 'Modifica notizia' }}</h2>
+
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div class="field">
+          <label for="f-title">Titolo *</label>
+          <input id="f-title" type="text" formControlName="title" maxlength="200"
+            [attr.aria-invalid]="form.controls.title.invalid && form.controls.title.touched" />
+        </div>
+
+        <div class="field">
+          <label for="f-body">Testo *</label>
+          <textarea id="f-body" formControlName="body" rows="10"
+            [attr.aria-invalid]="form.controls.body.invalid && form.controls.body.touched"
+            placeholder="Puoi usare HTML (es. &lt;p&gt;, &lt;b&gt;, &lt;ul&gt;)"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="f-cover">URL immagine copertina</label>
+          <input id="f-cover" type="url" formControlName="coverImageUrl" placeholder="https://..."
+            [attr.aria-invalid]="form.controls.coverImageUrl.invalid && form.controls.coverImageUrl.touched" />
+          @if (form.controls.coverImageUrl.invalid && form.controls.coverImageUrl.touched) {
+            <span class="field-error" role="alert">Inserisci un URL valido (es. https://esempio.it/foto.jpg)</span>
+          }
+        </div>
+
+        <div class="field">
+          <label for="f-tag">Tag *</label>
+          <select id="f-tag" formControlName="tag">
+            @for (tag of tags; track tag) {
+              <option [value]="tag">{{ tag }}</option>
+            }
+          </select>
+        </div>
+
+        @if (formMode() === 'edit') {
+          <div class="field field-inline">
+            <label for="f-visible">Visibile</label>
+            <input id="f-visible" type="checkbox" formControlName="isVisible" />
+          </div>
+        }
+
+        @if (error()) {
+          <p class="form-error" role="alert">{{ error() }}</p>
+        }
+
+        <div class="form-actions">
+          <button class="btn-secondary" type="button" (click)="closeForm()">Annulla</button>
+          <button class="btn-primary" type="submit" [disabled]="form.invalid || saving()">
+            {{ saving() ? 'Salvataggio...' : 'Salva' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <!-- Lista notizie -->
+  @if (notizie().length === 0) {
+    <p class="empty-state">Nessuna notizia ancora pubblicata.</p>
+  }
+
+  <ul class="news-list" aria-label="Elenco notizie admin">
+    @for (item of notizie(); track item.id) {
+      <li class="news-row" [class.hidden]="!item.isVisible">
+        <div class="news-info">
+          <span class="news-tag" [class]="'tag-' + item.tag.toLowerCase()">{{ item.tag }}</span>
+          <span class="news-date">{{ item.publishedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+          <span class="news-title">{{ item.title }}</span>
+          @if (!item.isVisible) {
+            <span class="badge-hidden" aria-label="Nascosta">Nascosta</span>
+          }
+        </div>
+        <div class="news-actions">
+          <button class="btn-icon" type="button" (click)="toggleVisibility(item)"
+            [attr.aria-label]="item.isVisible ? 'Nascondi' : 'Rendi visibile'">
+            {{ item.isVisible ? '👁' : '🚫' }}
+          </button>
+          <button class="btn-icon" type="button" (click)="openEdit(item)" aria-label="Modifica">✏️</button>
+          <button class="btn-icon btn-danger" type="button" (click)="delete(item)" aria-label="Elimina">🗑</button>
+        </div>
+      </li>
+    }
+  </ul>
+</div>

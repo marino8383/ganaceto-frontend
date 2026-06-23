@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/GIT2/ganaceto/Ganaceto//**)"
+    ],
+    "additionalDirectories": [
+      "c:\\GIT2\\ganaceto\\Ganaceto\\Ganaceto.Api",
+      "c:\\GIT2\\ganaceto\\Ganaceto\\Ganaceto.Core\\DTOs"
+    ]
+  }
+}
