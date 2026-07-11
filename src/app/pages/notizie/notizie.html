@@ -1,29 +1,48 @@
 <div class="notizie-page">
-  <h1 class="page-title">Notizie</h1>
+  <h1 class="page-title">Notizie ed eventi</h1>
 
   @if (notizie().length === 0) {
-    <p class="empty-state">Nessuna notizia disponibile.</p>
+    <p class="empty-state">Nessuna notizia al momento. Torna a trovarci presto! 🌿</p>
   }
 
   <ul class="notizie-list" aria-label="Elenco notizie">
-    @for (notizia of notizie(); track notizia.id) {
-      <li class="notizia-card">
-        <a class="notizia-link" [routerLink]="['/notizie', notizia.id]" [attr.aria-label]="'Leggi: ' + notizia.title">
-          @if (notizia.coverImageUrl) {
-            <img class="notizia-cover" [src]="notizia.coverImageUrl" [alt]="notizia.title" />
+    @for (n of notizie(); track n.id) {
+      <li class="notizia-card"
+          [class.has-cover]="!!n.coverImageUrl"
+          [class.expanded]="n.expandedInHome"
+          [style.--type]="tipo(n.tag).color">
+
+        @if (n.coverImageUrl) {
+          <a class="cover" [routerLink]="['/notizie', n.id]" [attr.aria-label]="'Apri: ' + n.title">
+            <img [src]="n.coverImageUrl" [alt]="n.title" />
+            <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
+          </a>
+        }
+
+        <div class="notizia-body">
+          @if (!n.coverImageUrl) {
+            <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
           }
-          <div class="notizia-body">
-            <div class="notizia-header">
-              <span class="notizia-tag" [class]="'tag-' + notizia.tag.toLowerCase()">
-                {{ notizia.tag }}
-              </span>
-              <time class="notizia-data" [attr.datetime]="notizia.publishedAt">
-                {{ notizia.publishedAt | date: 'dd/MM/yyyy HH:mm' }}
-              </time>
-            </div>
-            <h2 class="notizia-titolo">{{ notizia.title }}</h2>
+
+          @if (n.referenceDate) {
+            <div class="ref-date">📅 {{ n.referenceDate | date: 'EEEE d MMMM y' }}@if (orario(n)) { <span class="ref-time"> · {{ orario(n) }}</span> }</div>
+          }
+
+          <a class="notizia-titolo-link" [routerLink]="['/notizie', n.id]" [attr.aria-label]="'Apri: ' + n.title">
+            <h2 class="notizia-titolo">{{ n.title }}</h2>
+          </a>
+
+          @if (n.expandedInHome) {
+            <div class="notizia-contenuto" [innerHTML]="safe(n.body)"></div>
+          }
+
+          <div class="card-foot">
+            @if (!n.expandedInHome) {
+              <a class="leggi" [routerLink]="['/notizie', n.id]">Leggi →</a>
+            }
+            <time class="pub-date" [attr.datetime]="n.publishedAt">Pubblicata il {{ n.publishedAt | date: 'dd/MM/yyyy HH:mm' }}</time>
           </div>
-        </a>
+        </div>
       </li>
     }
   </ul>

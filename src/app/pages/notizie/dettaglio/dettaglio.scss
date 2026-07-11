@@ -1,115 +1,90 @@
 .dettaglio-page {
   max-width: 680px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 14px 14px 40px;
 }
 
 .back-link {
   display: inline-block;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.875rem;
-  color: var(--mat-sys-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
   text-decoration: none;
-  margin-bottom: 1rem;
+  margin-bottom: 14px;
 
-  &:hover {
-    text-decoration: underline;
-  }
+  &:hover { text-decoration: underline; }
 }
 
 .cover {
   width: 100%;
-  max-height: 300px;
+  max-height: 320px;
   object-fit: cover;
-  border-radius: 0.75rem;
-  margin-bottom: 1.25rem;
+  border-radius: 18px;
+  margin-bottom: 18px;
   display: block;
 }
 
 .dettaglio-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .notizia-tag {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.2em 0.6em;
-  border-radius: 2em;
-  background: var(--mat-sys-primary-container);
-  color: var(--mat-sys-on-primary-container);
-
-  &.tag-evento {
-    background: var(--mat-sys-secondary-container);
-    color: var(--mat-sys-on-secondary-container);
-  }
-
-  &.tag-avviso {
-    background: var(--mat-sys-error-container);
-    color: var(--mat-sys-on-error-container);
-  }
-
-  &.tag-comune {
-    background: var(--mat-sys-tertiary-container);
-    color: var(--mat-sys-on-tertiary-container);
-  }
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
 }
 
-.notizia-data {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.8rem;
-  color: var(--mat-sys-on-surface-variant);
+.ref-date {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: capitalize;
+  margin: 12px 0 2px;
 }
+.ref-time { color: var(--primary); }
 
 .dettaglio-titolo {
   font-family: 'Fraunces', serif;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   font-weight: 700;
-  color: var(--mat-sys-on-surface);
-  margin: 0 0 1.25rem 0;
-  line-height: 1.25;
+  color: var(--text);
+  margin: 6px 0 18px;
+  line-height: 1.22;
+}
+
+.pub-date {
+  display: block;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
 }
 
 .dettaglio-body {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9375rem;
-  line-height: 1.7;
-  color: var(--mat-sys-on-surface);
+  font-size: 0.97rem;
+  line-height: 1.72;
+  color: var(--text);
 
-  h1, h2, h3 {
-    font-family: 'Fraunces', serif;
-    margin-top: 1.5rem;
-  }
-
-  p {
-    margin: 0 0 1rem 0;
-  }
-
-  ul, ol {
-    padding-left: 1.5rem;
-    margin: 0 0 1rem 0;
-  }
-
-  img {
-    max-width: 100%;
-    border-radius: 0.5rem;
-  }
-
-  a {
-    color: var(--mat-sys-primary);
-  }
+  h1, h2, h3 { font-family: 'Fraunces', serif; margin-top: 1.4rem; }
+  p { margin: 0 0 1rem; }
+  ul, ol { padding-left: 1.4rem; margin: 0 0 1rem; }
+  img { max-width: 100%; border-radius: 12px; }
+  a { color: var(--primary); }
 }
 
 .errore-msg,
 .loading-msg {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.875rem;
-  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.9rem;
+  color: var(--muted);
   text-align: center;
-  padding: 2rem 0;
+  padding: 2.5rem 0;
 }

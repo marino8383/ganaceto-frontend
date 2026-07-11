@@ -1,0 +1,41 @@
+<div class="rt-toolbar" role="toolbar" aria-label="Formattazione testo">
+  <button type="button" (mousedown)="$event.preventDefault()" (click)="cmd('bold')" title="Grassetto" aria-label="Grassetto"><b>B</b></button>
+  <button type="button" (mousedown)="$event.preventDefault()" (click)="cmd('italic')" title="Corsivo" aria-label="Corsivo"><i>I</i></button>
+  <button type="button" (mousedown)="$event.preventDefault()" (click)="cmd('underline')" title="Sottolineato" aria-label="Sottolineato"><u>U</u></button>
+  <span class="rt-sep" aria-hidden="true"></span>
+  <button type="button" (mousedown)="$event.preventDefault()" (click)="cmd('insertUnorderedList')" title="Elenco puntato" aria-label="Elenco puntato">• ☰</button>
+  <button type="button" (mousedown)="$event.preventDefault()" (click)="cmd('outdent')" title="Riduci rientro" aria-label="Riduci rientro">⇤</button>
+  <button type="button" (mousedown)="$event.preventDefault()" (click)="cmd('indent')" title="Aumenta rientro" aria-label="Aumenta rientro">⇥</button>
+  <span class="rt-sep" aria-hidden="true"></span>
+  <label class="rt-img" title="Inserisci foto">
+    <input type="file" accept="image/*" hidden (change)="insertImage($event)" />
+    <span aria-hidden="true">📷</span>
+  </label>
+</div>
+
+@if (selectedImg()) {
+  <div class="rt-imgbar" role="toolbar" aria-label="Dimensione immagine">
+    <span class="rt-imgbar-lbl">🖼️ Dimensione:</span>
+    <button type="button" (mousedown)="$event.preventDefault()" (click)="sizeImg('30%')">Piccola</button>
+    <button type="button" (mousedown)="$event.preventDefault()" (click)="sizeImg('55%')">Media</button>
+    <button type="button" (mousedown)="$event.preventDefault()" (click)="sizeImg('80%')">Grande</button>
+    <button type="button" (mousedown)="$event.preventDefault()" (click)="sizeImg('100%')">Intera</button>
+    <button type="button" class="rt-imgbar-del" (mousedown)="$event.preventDefault()" (click)="removeSelectedImg()">🗑 Rimuovi</button>
+  </div>
+}
+
+<div
+  #editor
+  class="rt-editor"
+  contenteditable="true"
+  role="textbox"
+  aria-multiline="true"
+  [attr.aria-label]="ariaLabel()"
+  [attr.data-placeholder]="placeholder()"
+  (input)="onInput()"
+  (blur)="onInput()"
+  (click)="onEditorClick($event)"
+></div>
+@if (selectedImg()) {
+  <p class="rt-imghint">Immagine selezionata — scegli una dimensione qui sopra. Tocca il testo per deselezionare.</p>
+}

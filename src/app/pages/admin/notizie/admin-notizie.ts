@@ -1,19 +1,24 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { News, NewsItem, NewsTag } from '../../../services/news';
+import { News, NewsItem, NewsTag, NEWS_TYPES, newsType } from '../../../services/news';
+import { RichEditor } from '../../../components/rich-editor/rich-editor';
 
 type FormMode = 'closed' | 'create' | 'edit';
 
+// dimensione massima copertina caricata da dispositivo (evita payload enormi in DB)
+const MAX_COVER_BYTES = 2 * 1024 * 1024; // 2 MB
+
 @Component({
   selector: 'app-admin-notizie',
-  imports: [DatePipe, ReactiveFormsModule],
+  imports: [DatePipe, ReactiveFormsModule, RichEditor],
   templateUrl: './admin-notizie.html',
   styleUrl: './admin-notizie.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,14 +33,26 @@ export class AdminNotizie implements OnInit {
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
 
-  readonly tags: NewsTag[] = ['Avviso', 'Evento', 'Info', 'Comune'];
+  // anteprima copertina (data URL o http URL)
+  readonly cover = signal<string | null>(null);
+
+  // contenuto HTML dell'editor ricco (gestito fuori dal reactive form)
+  readonly body = signal('');
+  readonly bodyEmpty = computed(
+    () => this.body().replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length === 0,
+  );
+
+  readonly newsTypes = NEWS_TYPES;
+  readonly tipo = newsType;
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
-    body: ['', Validators.required],
-    coverImageUrl: ['', Validators.pattern(/^(https?:\/\/.+)?$/)],
-    tag: ['Info' as NewsTag, Validators.required],
+    tag: ['Evento' as NewsTag, Validators.required],
     isVisible: [true],
+    expandedInHome: [false],
+    referenceDate: [''],
+    startTime: [''],
+    endTime: [''],
   });
 
   ngOnInit(): void {
@@ -43,7 +60,12 @@ export class AdminNotizie implements OnInit {
   }
 
   openCreate(): void {
-    this.form.reset({ title: '', body: '', coverImageUrl: '', tag: 'Info', isVisible: true });
+    this.form.reset({
+      title: '', tag: 'Evento', isVisible: true, expandedInHome: false,
+      referenceDate: '', startTime: '', endTime: '',
+    });
+    this.body.set('');
+    this.cover.set(null);
     this.editingId.set(null);
     this.formMode.set('create');
     this.error.set(null);
@@ -52,11 +74,15 @@ export class AdminNotizie implements OnInit {
   openEdit(item: NewsItem): void {
     this.form.setValue({
       title: item.title,
-      body: item.body,
-      coverImageUrl: item.coverImageUrl ?? '',
       tag: item.tag,
       isVisible: item.isVisible,
+      expandedInHome: item.expandedInHome,
+      referenceDate: item.referenceDate ?? '',
+      startTime: item.startTime ?? '',
+      endTime: item.endTime ?? '',
     });
+    this.body.set(item.body);
+    this.cover.set(item.coverImageUrl);
     this.editingId.set(item.id);
     this.formMode.set('edit');
     this.error.set(null);
@@ -66,47 +92,63 @@ export class AdminNotizie implements OnInit {
     this.formMode.set('closed');
   }
 
+  onCoverSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_COVER_BYTES) {
+      this.error.set('Immagine troppo grande (max 2 MB).');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.cover.set(reader.result as string);
+      this.error.set(null);
+    };
+    reader.readAsDataURL(file);
+    input.value = ''; // consente di ricaricare lo stesso file
+  }
+
+  removeCover(): void {
+    this.cover.set(null);
+  }
+
   save(): void {
-    if (this.form.invalid || this.saving()) return;
+    if (this.form.invalid || this.bodyEmpty() || this.saving()) return;
 
     const raw = this.form.getRawValue();
     const dto = {
       title: raw.title,
-      body: raw.body,
-      coverImageUrl: raw.coverImageUrl || null,
+      body: this.body(),
+      coverImageUrl: this.cover(),
       tag: raw.tag,
+      expandedInHome: raw.expandedInHome,
+      referenceDate: raw.referenceDate || null,
+      startTime: raw.startTime || null,
+      endTime: raw.endTime || null,
     };
 
     this.saving.set(true);
     this.error.set(null);
 
-    const mode = this.formMode();
+    const done = () => {
+      this.newsService.loadAdminNotizie();
+      this.formMode.set('closed');
+      this.saving.set(false);
+    };
+    const fail = () => {
+      this.error.set('Errore durante il salvataggio.');
+      this.saving.set(false);
+    };
 
-    if (mode === 'create') {
-      this.newsService.create(dto).subscribe({
-        next: () => {
-          this.newsService.loadAdminNotizie();
-          this.formMode.set('closed');
-          this.saving.set(false);
-        },
-        error: () => {
-          this.error.set('Errore durante il salvataggio.');
-          this.saving.set(false);
-        },
-      });
+    if (this.formMode() === 'create') {
+      this.newsService.create(dto).subscribe({ next: done, error: fail });
     } else {
       const id = this.editingId()!;
-      this.newsService.update(id, { ...dto, isVisible: raw.isVisible }).subscribe({
-        next: () => {
-          this.newsService.loadAdminNotizie();
-          this.formMode.set('closed');
-          this.saving.set(false);
-        },
-        error: () => {
-          this.error.set('Errore durante il salvataggio.');
-          this.saving.set(false);
-        },
-      });
+      this.newsService.update(id, { ...dto, isVisible: raw.isVisible }).subscribe({ next: done, error: fail });
     }
   }
 
@@ -125,6 +167,10 @@ export class AdminNotizie implements OnInit {
         coverImageUrl: item.coverImageUrl,
         tag: item.tag,
         isVisible: !item.isVisible,
+        expandedInHome: item.expandedInHome,
+        referenceDate: item.referenceDate,
+        startTime: item.startTime,
+        endTime: item.endTime,
       })
       .subscribe({ next: () => this.newsService.loadAdminNotizie() });
   }

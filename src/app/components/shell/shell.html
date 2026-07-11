@@ -1,32 +1,62 @@
-<div class="app-container">
+<div class="app">
 
   <!-- Header -->
   <header class="app-header">
-    <div class="header-logo">G</div>
-    <div class="header-text">
-      <span class="header-title">Insieme per Ganaceto</span>
-      <span class="header-sub">Comunità · Casina · Iniziative</span>
+    <div class="brand">
+      <span class="logo"><img src="logo-icon.png" width="191" height="209" alt="Insieme per Ganaceto" /></span>
+      <span class="htitle">Insieme per Ganaceto</span>
     </div>
-    <button class="profile-btn" (click)="openProfilo()">
-      <span class="profile-icon">👤</span>
+    <span class="spacer"></span>
+    <span class="online-pill" title="Persone online ora">
+      <span class="op-dot"></span>{{ online() }}<span class="op-lbl">&nbsp;online</span>
+    </span>
+    <button
+      class="pbtn"
+      [class.user]="isLogged() && !isAdmin()"
+      [class.admin]="isAdmin()"
+      (click)="openProfilo()"
+      aria-label="Profilo">
+      @if (isLogged()) { {{ initial() }} } @else { 👤 }
     </button>
   </header>
 
-  <!-- Contenuto pagina -->
-  <main class="app-main">
-    <router-outlet />
-  </main>
+  <!-- Corpo: sidebar (desktop) + contenuto scrollabile -->
+  <div class="body">
+    <nav class="sidebar" aria-label="Navigazione">
+      @for (t of tabs(); track t.path) {
+        <a class="side-item" [routerLink]="t.path" routerLinkActive="active">
+          <span class="ic">{{ t.icon }}</span><span class="lbl">{{ t.label }}</span>
+        </a>
+      }
+      @if (isAdmin()) {
+        <div class="side-sep"></div>
+        <div class="side-lbl">Amministrazione</div>
+        <a class="side-item" routerLink="/admin/notizie" routerLinkActive="active">
+          <span class="ic">🛠️</span><span class="lbl">Gestione notizie</span>
+        </a>
+      }
+    </nav>
 
-  <!-- Tab bar in fondo -->
-  <nav class="tab-bar">
-    @for (tab of tabs; track tab.path) {
-      <a class="tab-item"
-         [routerLink]="tab.path"
-         routerLinkActive="active">
-        <span class="tab-icon">{{ tab.icon }}</span>
-        <span class="tab-label">{{ tab.label }}</span>
+    <main class="main">
+      <router-outlet />
+    </main>
+  </div>
+
+  <!-- Tab bar mobile: solo icone, fissa in fondo -->
+  <nav class="tabbar" aria-label="Navigazione">
+    @for (t of tabs(); track t.path) {
+      <a class="tab" [routerLink]="t.path" routerLinkActive="active" [title]="t.label" [attr.aria-label]="t.label">
+        <span class="ico">{{ t.icon }}</span>
       </a>
     }
   </nav>
+
+  <!-- Splash d'apertura -->
+  @if (splashVisible()) {
+    <div class="splash" (click)="hideSplash()">
+      <img class="splash-mark" src="logo-wordmark.png" width="458" height="170" alt="Insieme per Ganaceto" />
+      <div class="splash-hint">Tocca per entrare</div>
+    </div>
+  }
 
 </div>

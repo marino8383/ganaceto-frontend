@@ -19,34 +19,70 @@
         </div>
 
         <div class="field">
-          <label for="f-body">Testo *</label>
-          <textarea id="f-body" formControlName="body" rows="10"
-            [attr.aria-invalid]="form.controls.body.invalid && form.controls.body.touched"
-            placeholder="Puoi usare HTML (es. &lt;p&gt;, &lt;b&gt;, &lt;ul&gt;)"></textarea>
+          <label>Tipo di notizia *</label>
+          <div class="type-seg" role="group" aria-label="Tipo di notizia">
+            @for (t of newsTypes; track t.value) {
+              <button type="button" class="type-chip"
+                [class.on]="form.controls.tag.value === t.value"
+                [style.--chip]="t.color"
+                [attr.aria-pressed]="form.controls.tag.value === t.value"
+                (click)="form.controls.tag.setValue(t.value)">
+                <span aria-hidden="true">{{ t.icon }}</span> {{ t.label }}
+              </button>
+            }
+          </div>
         </div>
 
         <div class="field">
-          <label for="f-cover">URL immagine copertina</label>
-          <input id="f-cover" type="url" formControlName="coverImageUrl" placeholder="https://..."
-            [attr.aria-invalid]="form.controls.coverImageUrl.invalid && form.controls.coverImageUrl.touched" />
-          @if (form.controls.coverImageUrl.invalid && form.controls.coverImageUrl.touched) {
-            <span class="field-error" role="alert">Inserisci un URL valido (es. https://esempio.it/foto.jpg)</span>
+          <label>Contenuto *</label>
+          <app-rich-editor [(value)]="body" ariaLabel="Contenuto dell'evento"
+            placeholder="Descrivi l'evento: data, orari, dettagli…" />
+          @if (bodyEmpty()) {
+            <span class="field-hint">Il contenuto è obbligatorio.</span>
           }
         </div>
 
         <div class="field">
-          <label for="f-tag">Tag *</label>
-          <select id="f-tag" formControlName="tag">
-            @for (tag of tags; track tag) {
-              <option [value]="tag">{{ tag }}</option>
-            }
-          </select>
+          <label for="f-refdate">Data di riferimento <span class="field-hint">(facoltativa — es. data dell'evento/avviso)</span></label>
+          <input id="f-refdate" type="date" formControlName="referenceDate" />
+        </div>
+
+        <div class="field field-times">
+          <div>
+            <label for="f-start">Dalle</label>
+            <input id="f-start" type="time" formControlName="startTime" />
+          </div>
+          <div>
+            <label for="f-end">Alle</label>
+            <input id="f-end" type="time" formControlName="endTime" />
+          </div>
+          <span class="field-hint">Fascia oraria facoltativa</span>
+        </div>
+
+        <div class="field">
+          <label>Immagine di copertina</label>
+          @if (cover(); as c) {
+            <div class="cover-preview">
+              <img [src]="c" alt="Anteprima copertina" />
+              <button class="cover-remove" type="button" (click)="removeCover()" aria-label="Rimuovi copertina">✕</button>
+            </div>
+          }
+          <label class="cover-pick">
+            <input type="file" accept="image/*" (change)="onCoverSelected($event)" hidden />
+            <span>{{ cover() ? '🔄 Cambia immagine' : '📷 Scegli o scatta una foto' }}</span>
+          </label>
+          <span class="field-hint">Facoltativa · max 2 MB</span>
+        </div>
+
+        <div class="field field-inline">
+          <input id="f-expanded" type="checkbox" formControlName="expandedInHome" />
+          <label for="f-expanded">Notizia estesa — mostra il contenuto completo già in home (senza doverla aprire)</label>
         </div>
 
         @if (formMode() === 'edit') {
           <div class="field field-inline">
-            <label for="f-visible">Visibile</label>
             <input id="f-visible" type="checkbox" formControlName="isVisible" />
+            <label for="f-visible">Visibile</label>
           </div>
         }
 
@@ -56,7 +92,7 @@
 
         <div class="form-actions">
           <button class="btn-secondary" type="button" (click)="closeForm()">Annulla</button>
-          <button class="btn-primary" type="submit" [disabled]="form.invalid || saving()">
+          <button class="btn-primary" type="submit" [disabled]="form.invalid || bodyEmpty() || saving()">
             {{ saving() ? 'Salvataggio...' : 'Salva' }}
           </button>
         </div>
@@ -73,7 +109,7 @@
     @for (item of notizie(); track item.id) {
       <li class="news-row" [class.hidden]="!item.isVisible">
         <div class="news-info">
-          <span class="news-tag" [class]="'tag-' + item.tag.toLowerCase()">{{ item.tag }}</span>
+          <span class="news-tag" [style.background]="tipo(item.tag).color">{{ tipo(item.tag).icon }} {{ tipo(item.tag).label }}</span>
           <span class="news-date">{{ item.publishedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
           <span class="news-title">{{ item.title }}</span>
           @if (!item.isVisible) {

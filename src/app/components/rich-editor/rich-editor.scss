@@ -1,0 +1,89 @@
+:host { display: block; }
+
+.rt-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 11px 11px 0 0;
+  padding: 6px;
+
+  button,
+  .rt-img {
+    min-width: 34px;
+    height: 32px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text);
+    cursor: pointer;
+    padding: 0 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover { background: var(--primary-container); }
+    &:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+  }
+}
+
+.rt-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--line);
+  margin: 0 3px;
+}
+
+/* barra dimensione immagine (compare quando un'immagine è selezionata) */
+.rt-imgbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  background: var(--accent-soft);
+  border-left: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+
+  .rt-imgbar-lbl { font-size: 0.8rem; font-weight: 600; color: var(--text); margin-right: 2px; }
+
+  button {
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid var(--accent);
+    background: var(--surface);
+    color: var(--accent);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover { background: var(--accent); color: #fff; }
+    &:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+  }
+  .rt-imgbar-del { border-color: var(--danger); color: var(--danger); &:hover { background: var(--danger); color: #fff; } }
+}
+.rt-imghint { font-size: 0.75rem; color: var(--muted); margin: 6px 2px 0; }
+
+.rt-editor {
+  border: 1px solid var(--line);
+  border-radius: 0 0 11px 11px;
+  padding: 12px;
+  min-height: 160px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+
+  &:focus { border-color: var(--accent); }
+  &:empty::before { content: attr(data-placeholder); color: var(--muted); }
+
+  img { max-width: 100%; border-radius: 8px; }
+  ul, ol { padding-left: 1.4rem; margin: 0.4rem 0; }
+  p { margin: 0 0 0.6rem; }
+}

@@ -1,39 +1,37 @@
-// Include theming for Angular Material with `mat.theme()`.
-// This Sass mixin will define CSS variables that are used for styling Angular Material
-// components according to the Material 3 design spec.
-// Learn more about theming and how to use it for your application's
-// custom components at https://material.angular.dev/guide/theming
+// Angular Material (usato per il bottom-sheet del profilo)
 @use '@angular/material' as mat;
 
 html {
   height: 100%;
-  @include mat.theme(
-    (
-      color: (
-        primary: mat.$azure-palette,
-        tertiary: mat.$blue-palette,
-      ),
-      typography: Roboto,
-      density: 0,
-    )
-  );
+  @include mat.theme((
+    color: ( primary: mat.$azure-palette, tertiary: mat.$blue-palette ),
+    typography: Roboto,
+    density: 0,
+  ));
 }
+
+// ── Design tokens "Insieme per Ganaceto" (dal mockup) ────────────────────
+:root {
+  --bg:#f4efe8; --surface:#fffdf9; --surface-2:#f7f1e8;
+  --primary:#7a5a3a; --primary-container:#e8dcc8; --on-primary:#fff; --on-primary-container:#3d2c19;
+  --accent:#5e7d4f; --accent-soft:#e2ecd9;
+  --danger:#b3402f; --danger-soft:#f6dcd6;
+  --text:#2c241c; --muted:#8a7f70; --line:#e7ddcd;
+  --shadow:0 14px 40px rgba(60,44,25,.18);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
   color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
   height: 100%;
+  background: radial-gradient(1200px 500px at 80% -10%, #efe6d6 0, transparent 60%), var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
-/* You can add global styles to this file, and also import other style files */
+
+// Titoli con il serif del brand
+h1, h2, h3, .font-serif { font-family: 'Fraunces', serif; }
