@@ -34,12 +34,10 @@
         </div>
 
         <div class="field">
-          <label>Contenuto *</label>
-          <app-rich-editor [(value)]="body" ariaLabel="Contenuto dell'evento"
-            placeholder="Descrivi l'evento: data, orari, dettagli…" />
-          @if (bodyEmpty()) {
-            <span class="field-hint">Il contenuto è obbligatorio.</span>
-          }
+          <label for="f-body">Contenuto *</label>
+          <textarea id="f-body" formControlName="body" rows="8"
+            placeholder="Scrivi il testo normalmente. Lascia una riga vuota per separare i paragrafi. I numeri di telefono, i link e le email diventano cliccabili da soli."></textarea>
+          <span class="field-hint">Scrivi semplice: all'impaginazione (paragrafi, telefono cliccabile, WhatsApp) pensa l'app. Per la foto/locandina usa la copertina qui sotto.</span>
         </div>
 
         <div class="field">
@@ -92,7 +90,7 @@
 
         <div class="form-actions">
           <button class="btn-secondary" type="button" (click)="closeForm()">Annulla</button>
-          <button class="btn-primary" type="submit" [disabled]="form.invalid || bodyEmpty() || saving()">
+          <button class="btn-primary" type="submit" [disabled]="form.invalid || saving()">
             {{ saving() ? 'Salvataggio...' : 'Salva' }}
           </button>
         </div>

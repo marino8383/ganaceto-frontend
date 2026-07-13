@@ -1,7 +1,6 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  computed,
   inject,
   OnInit,
   signal,
@@ -9,7 +8,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { News, NewsItem, NewsTag, NEWS_TYPES, newsType } from '../../../services/news';
-import { RichEditor } from '../../../components/rich-editor/rich-editor';
+import { htmlToPlain } from '../../../shared/format';
 
 type FormMode = 'closed' | 'create' | 'edit';
 
@@ -18,7 +17,7 @@ const MAX_COVER_BYTES = 2 * 1024 * 1024; // 2 MB
 
 @Component({
   selector: 'app-admin-notizie',
-  imports: [DatePipe, ReactiveFormsModule, RichEditor],
+  imports: [DatePipe, ReactiveFormsModule],
   templateUrl: './admin-notizie.html',
   styleUrl: './admin-notizie.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,17 +35,12 @@ export class AdminNotizie implements OnInit {
   // anteprima copertina (data URL o http URL)
   readonly cover = signal<string | null>(null);
 
-  // contenuto HTML dell'editor ricco (gestito fuori dal reactive form)
-  readonly body = signal('');
-  readonly bodyEmpty = computed(
-    () => this.body().replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length === 0,
-  );
-
   readonly newsTypes = NEWS_TYPES;
   readonly tipo = newsType;
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
+    body: ['', Validators.required], // testo semplice; l'app lo impagina in automatico
     tag: ['Evento' as NewsTag, Validators.required],
     isVisible: [true],
     expandedInHome: [false],
@@ -61,10 +55,9 @@ export class AdminNotizie implements OnInit {
 
   openCreate(): void {
     this.form.reset({
-      title: '', tag: 'Evento', isVisible: true, expandedInHome: false,
+      title: '', body: '', tag: 'Evento', isVisible: true, expandedInHome: false,
       referenceDate: '', startTime: '', endTime: '',
     });
-    this.body.set('');
     this.cover.set(null);
     this.editingId.set(null);
     this.formMode.set('create');
@@ -74,6 +67,7 @@ export class AdminNotizie implements OnInit {
   openEdit(item: NewsItem): void {
     this.form.setValue({
       title: item.title,
+      body: htmlToPlain(item.body), // notizie vecchie (HTML) → testo semplice modificabile
       tag: item.tag,
       isVisible: item.isVisible,
       expandedInHome: item.expandedInHome,
@@ -81,7 +75,6 @@ export class AdminNotizie implements OnInit {
       startTime: item.startTime ?? '',
       endTime: item.endTime ?? '',
     });
-    this.body.set(item.body);
     this.cover.set(item.coverImageUrl);
     this.editingId.set(item.id);
     this.formMode.set('edit');
@@ -117,12 +110,12 @@ export class AdminNotizie implements OnInit {
   }
 
   save(): void {
-    if (this.form.invalid || this.bodyEmpty() || this.saving()) return;
+    if (this.form.invalid || this.saving()) return;
 
     const raw = this.form.getRawValue();
     const dto = {
       title: raw.title,
-      body: this.body(),
+      body: raw.body.trim(),
       coverImageUrl: this.cover(),
       tag: raw.tag,
       expandedInHome: raw.expandedInHome,

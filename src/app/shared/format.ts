@@ -4,6 +4,42 @@
 
 const TOKEN = /((?:https?:\/\/|www\.)[^\s<]+)|([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})|(\+?\d[\d\s./-]{6,}\d)/g;
 
+const HAS_TAGS = /<[a-z/][\s\S]*>/i;
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Testo semplice → HTML impaginato: riga vuota = nuovo paragrafo, a-capo singolo = <br>.
+export function plainTextToHtml(text: string): string {
+  const esc = escapeHtml((text ?? '').trim());
+  return esc
+    .split(/\n{2,}/)
+    .map((p) => p.replace(/\n/g, '<br>').trim())
+    .filter((p) => p.length > 0)
+    .map((p) => `<p>${p}</p>`)
+    .join('');
+}
+
+// Rende il corpo notizia: se è già HTML (notizie vecchie) lo usa così com'è,
+// altrimenti impagina il testo semplice. In ogni caso rende attivi telefoni/link.
+export function renderNewsBody(body: string): string {
+  if (!body) return '';
+  const html = HAS_TAGS.test(body) ? body : plainTextToHtml(body);
+  return linkifyHtml(html);
+}
+
+// HTML → testo semplice (per ricaricare in modifica le notizie vecchie senza tag).
+export function htmlToPlain(html: string): string {
+  if (!html) return '';
+  if (!HAS_TAGS.test(html)) return html;
+  const prepared = html
+    .replace(/<\/(p|div|h[1-6]|li)>/gi, '\n')
+    .replace(/<br\s*\/?>/gi, '\n');
+  const doc = new DOMParser().parseFromString(prepared, 'text/html');
+  return (doc.body.textContent ?? '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 export function linkifyHtml(html: string): string {
   if (!html) return html;
   const doc = new DOMParser().parseFromString(html, 'text/html');
