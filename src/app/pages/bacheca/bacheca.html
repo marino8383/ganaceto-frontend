@@ -1,13 +1,8 @@
 <div class="bacheca-page">
-  <h1 class="page-title">Bacheca</h1>
 
-  <!-- Nuovo messaggio (solo utenti loggati) -->
+  <!-- Nuovo messaggio: si apre col pulsante flottante ✏️ (solo utenti loggati) -->
   @if (auth.isLoggedIn) {
-    @if (!composing()) {
-      <button class="compose-trigger" type="button" (click)="composing.set(true)">
-        ✏️ Scrivi un messaggio
-      </button>
-    } @else {
+    @if (composing()) {
     <section class="postbox" aria-label="Scrivi un messaggio">
       <div class="postbox-head">
         <strong>Nuovo messaggio</strong>
@@ -180,4 +175,9 @@
       </li>
     }
   </ul>
+
+  <!-- Pulsante flottante: scrivi un nuovo messaggio -->
+  @if (auth.isLoggedIn && !composing()) {
+    <button class="fab" type="button" (click)="composing.set(true)" aria-label="Scrivi un messaggio" title="Scrivi un messaggio">✏️</button>
+  }
 </div>

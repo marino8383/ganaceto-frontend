@@ -1,7 +1,7 @@
 .bacheca-page {
   max-width: 680px;
   margin: 0 auto;
-  padding: 16px 14px 28px;
+  padding: 16px 14px 96px; // spazio in fondo per non coprire l'ultimo messaggio col FAB
 }
 
 .page-title {
@@ -167,19 +167,31 @@ textarea {
   box-shadow: 0 6px 18px rgba(60, 44, 25, .06);
 }
 
-/* trigger "scrivi" (lista-first) */
-.compose-trigger {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 14px;
-  border: 1.5px dashed var(--primary);
-  border-radius: 14px;
-  background: var(--primary-container);
-  color: var(--on-primary-container);
-  font-weight: 700;
-  font-size: 0.95rem;
+/* pulsante flottante "scrivi" (stile app) */
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
   cursor: pointer;
-  &:hover { background: color-mix(in srgb, var(--primary-container) 82%, var(--primary)); }
+  box-shadow: 0 8px 20px rgba(60, 44, 25, .35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  transition: transform .12s ease;
+  &:hover { transform: scale(1.06); }
+  &:active { transform: scale(.96); }
+}
+@media (min-width: 900px) {
+  .fab { bottom: 24px; right: 24px; }
 }
 .postbox-head {
   display: flex;
