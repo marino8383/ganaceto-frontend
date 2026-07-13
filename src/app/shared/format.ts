@@ -11,8 +11,12 @@ function escapeHtml(s: string): string {
 }
 
 // Testo semplice → HTML impaginato: riga vuota = nuovo paragrafo, a-capo singolo = <br>.
+// Formattazione minima in stile markdown: **grassetto** e _corsivo_.
 export function plainTextToHtml(text: string): string {
-  const esc = escapeHtml((text ?? '').trim());
+  let esc = escapeHtml((text ?? '').trim());
+  esc = esc
+    .replace(/\*\*([^\n*]+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^\w])_([^\n_]+?)_(?!\w)/g, '$1<em>$2</em>');
   return esc
     .split(/\n{2,}/)
     .map((p) => p.replace(/\n/g, '<br>').trim())

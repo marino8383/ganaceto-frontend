@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  viewChild,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -34,6 +36,24 @@ export class AdminNotizie implements OnInit {
 
   // anteprima copertina (data URL o http URL)
   readonly cover = signal<string | null>(null);
+
+  private readonly bodyRef = viewChild<ElementRef<HTMLTextAreaElement>>('bodyArea');
+
+  // Avvolge la selezione con i marcatori (**grassetto**, _corsivo_).
+  wrap(marker: string): void {
+    const ta = this.bodyRef()?.nativeElement;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const val = ta.value;
+    const sel = val.slice(start, end) || 'testo';
+    const next = val.slice(0, start) + marker + sel + marker + val.slice(end);
+    this.form.controls.body.setValue(next);
+    queueMicrotask(() => {
+      ta.focus();
+      ta.setSelectionRange(start + marker.length, start + marker.length + sel.length);
+    });
+  }
 
   readonly newsTypes = NEWS_TYPES;
   readonly tipo = newsType;

@@ -35,9 +35,13 @@
 
         <div class="field">
           <label for="f-body">Contenuto *</label>
-          <textarea id="f-body" formControlName="body" rows="8"
+          <div class="mini-tools">
+            <button type="button" (click)="wrap('**')" title="Grassetto: seleziona il testo e premi"><b>B</b></button>
+            <button type="button" (click)="wrap('_')" title="Corsivo: seleziona il testo e premi"><i>I</i></button>
+          </div>
+          <textarea #bodyArea id="f-body" formControlName="body" rows="8"
             placeholder="Scrivi il testo normalmente. Lascia una riga vuota per separare i paragrafi. I numeri di telefono, i link e le email diventano cliccabili da soli."></textarea>
-          <span class="field-hint">Scrivi semplice: all'impaginazione (paragrafi, telefono cliccabile, WhatsApp) pensa l'app. Per la foto/locandina usa la copertina qui sotto.</span>
+          <span class="field-hint">Scrivi semplice: paragrafi, telefono/WhatsApp e link li gestisce l'app. Per grassetto/corsivo seleziona il testo e usa <b>B</b>/<i>I</i>. Per la foto/locandina usa la copertina qui sotto.</span>
         </div>
 
         <div class="field">
