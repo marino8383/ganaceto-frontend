@@ -113,10 +113,6 @@
             }
           </span>
         </div>
-        <div class="mmeta">
-          <span class="mtag" [style.background]="tipo(msg.tag).color">{{ tipo(msg.tag).icon }} {{ tipo(msg.tag).label }}</span>
-          <time class="mtime" [attr.datetime]="msg.createdAt">{{ msg.createdAt | date: 'dd/MM HH:mm' }}</time>
-        </div>
 
         @if (msg.testo) {
           <p class="mtext">{{ msg.testo }}</p>
@@ -159,21 +155,28 @@
           </ul>
         }
 
-        <!-- Box risposta -->
-        @if (auth.isLoggedIn) {
-          @if (rispondendoA() === msg.id) {
-            <form class="reply-form" [formGroup]="replyForm" (ngSubmit)="inviaRisposta(msg.id)" novalidate>
-              <textarea formControlName="testo" rows="2" maxlength="500" placeholder="Scrivi una risposta…"></textarea>
-              <div class="reply-actions">
-                <button class="btn-secondary" type="button" (click)="annullaRisposta()">Annulla</button>
-                <button class="btn-primary" type="submit" [disabled]="replyForm.invalid || sending()">
-                  {{ sending() ? 'Invio…' : 'Rispondi' }}
-                </button>
-              </div>
-            </form>
-          } @else {
+        <!-- Piede: Rispondi a sinistra · tag e ora a destra -->
+        <div class="msg-foot">
+          @if (auth.isLoggedIn && rispondendoA() !== msg.id) {
             <button class="linkbtn" type="button" (click)="rispondi(msg.id)">↩ Rispondi</button>
           }
+          <span class="foot-meta">
+            <span class="mtag" [style.background]="tipo(msg.tag).color">{{ tipo(msg.tag).icon }} {{ tipo(msg.tag).label }}</span>
+            <time class="mtime" [attr.datetime]="msg.createdAt">{{ msg.createdAt | date: 'dd/MM HH:mm' }}</time>
+          </span>
+        </div>
+
+        <!-- Box risposta -->
+        @if (auth.isLoggedIn && rispondendoA() === msg.id) {
+          <form class="reply-form" [formGroup]="replyForm" (ngSubmit)="inviaRisposta(msg.id)" novalidate>
+            <textarea formControlName="testo" rows="2" maxlength="500" placeholder="Scrivi una risposta…"></textarea>
+            <div class="reply-actions">
+              <button class="btn-secondary" type="button" (click)="annullaRisposta()">Annulla</button>
+              <button class="btn-primary" type="submit" [disabled]="replyForm.invalid || sending()">
+                {{ sending() ? 'Invio…' : 'Rispondi' }}
+              </button>
+            </div>
+          </form>
         }
       </li>
     }
