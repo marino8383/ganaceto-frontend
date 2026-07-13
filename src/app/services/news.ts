@@ -4,6 +4,8 @@ import { API_BASE_URL } from '../app.config';
 
 export type NewsTag = 'Avviso' | 'Evento' | 'Info' | 'Comune' | 'ControlloVicinato';
 
+export type CoverSize = 'small' | 'medium' | 'large';
+
 export interface NewsType {
   value: NewsTag;
   label: string;
@@ -39,6 +41,7 @@ export interface NewsItem {
   referenceDate: string | null; // "yyyy-MM-dd" data di riferimento facoltativa
   startTime: string | null; // "HH:mm"
   endTime: string | null; // "HH:mm"
+  coverSize: CoverSize | null;
 }
 
 export interface CreateNewsDto {
@@ -50,6 +53,7 @@ export interface CreateNewsDto {
   referenceDate: string | null;
   startTime: string | null;
   endTime: string | null;
+  coverSize: CoverSize | null;
 }
 
 export interface UpdateNewsDto {
@@ -62,6 +66,7 @@ export interface UpdateNewsDto {
   referenceDate: string | null;
   startTime: string | null;
   endTime: string | null;
+  coverSize: CoverSize | null;
 }
 
 /** Fascia oraria leggibile: "9:00–10:00", "dalle 9:00", oppure "" */

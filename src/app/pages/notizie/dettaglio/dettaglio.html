@@ -8,7 +8,7 @@
     <a class="back-link" routerLink="/notizie" aria-label="Torna alle notizie">← Notizie</a>
 
     @if (n.coverImageUrl) {
-      <img class="cover" [src]="n.coverImageUrl" [alt]="n.title" />
+      <img class="cover" [attr.data-size]="n.coverSize || 'medium'" [src]="n.coverImageUrl" [alt]="n.title" />
     }
 
     <header class="dettaglio-header">

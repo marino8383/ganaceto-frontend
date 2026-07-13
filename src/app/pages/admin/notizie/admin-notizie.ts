@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { News, NewsItem, NewsTag, NEWS_TYPES, newsType } from '../../../services/news';
+import { CoverSize, News, NewsItem, NewsTag, NEWS_TYPES, newsType } from '../../../services/news';
 import { htmlToPlain } from '../../../shared/format';
 
 type FormMode = 'closed' | 'create' | 'edit';
@@ -67,6 +67,7 @@ export class AdminNotizie implements OnInit {
     referenceDate: [''],
     startTime: [''],
     endTime: [''],
+    coverSize: ['medium' as CoverSize],
   });
 
   ngOnInit(): void {
@@ -76,7 +77,7 @@ export class AdminNotizie implements OnInit {
   openCreate(): void {
     this.form.reset({
       title: '', body: '', tag: 'Evento', isVisible: true, expandedInHome: false,
-      referenceDate: '', startTime: '', endTime: '',
+      referenceDate: '', startTime: '', endTime: '', coverSize: 'medium',
     });
     this.cover.set(null);
     this.editingId.set(null);
@@ -94,6 +95,7 @@ export class AdminNotizie implements OnInit {
       referenceDate: item.referenceDate ?? '',
       startTime: item.startTime ?? '',
       endTime: item.endTime ?? '',
+      coverSize: item.coverSize ?? 'medium',
     });
     this.cover.set(item.coverImageUrl);
     this.editingId.set(item.id);
@@ -142,6 +144,7 @@ export class AdminNotizie implements OnInit {
       referenceDate: raw.referenceDate || null,
       startTime: raw.startTime || null,
       endTime: raw.endTime || null,
+      coverSize: raw.coverSize,
     };
 
     this.saving.set(true);
@@ -184,6 +187,7 @@ export class AdminNotizie implements OnInit {
         referenceDate: item.referenceDate,
         startTime: item.startTime,
         endTime: item.endTime,
+        coverSize: item.coverSize,
       })
       .subscribe({ next: () => this.newsService.loadAdminNotizie() });
   }

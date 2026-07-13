@@ -18,12 +18,15 @@
 .cover {
   width: 100%;
   height: auto;
-  max-height: 80vh;
   object-fit: contain;
   background: var(--surface-2);
   border-radius: 18px;
   margin-bottom: 18px;
   display: block;
+
+  &[data-size="small"] { max-height: 220px; }
+  &[data-size="medium"] { max-height: 380px; }
+  &[data-size="large"] { max-height: 80vh; }
 }
 
 .dettaglio-header {

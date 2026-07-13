@@ -74,6 +74,15 @@
             <span>{{ cover() ? '🔄 Cambia immagine' : '📷 Scegli o scatta una foto' }}</span>
           </label>
           <span class="field-hint">Facoltativa · max 2 MB</span>
+
+          @if (cover()) {
+            <div class="cover-size">
+              <span class="cover-size-lbl">Dimensione copertina:</span>
+              <button type="button" [class.on]="form.controls.coverSize.value === 'small'" (click)="form.controls.coverSize.setValue('small')">Piccola</button>
+              <button type="button" [class.on]="form.controls.coverSize.value === 'medium'" (click)="form.controls.coverSize.setValue('medium')">Media</button>
+              <button type="button" [class.on]="form.controls.coverSize.value === 'large'" (click)="form.controls.coverSize.setValue('large')">Grande</button>
+            </div>
+          }
         </div>
 
         <div class="field field-inline">
