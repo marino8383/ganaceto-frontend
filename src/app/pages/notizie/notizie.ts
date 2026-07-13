@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { News, newsType, newsTimeRange } from '../../services/news';
+import { linkifyHtml } from '../../shared/format';
 
 @Component({
   selector: 'app-notizie',
@@ -23,7 +24,7 @@ export class Notizie implements OnInit {
   safe(html: string): SafeHtml {
     let v = this.safeCache.get(html);
     if (!v) {
-      v = this.sanitizer.bypassSecurityTrustHtml(html);
+      v = this.sanitizer.bypassSecurityTrustHtml(linkifyHtml(html));
       this.safeCache.set(html, v);
     }
     return v;

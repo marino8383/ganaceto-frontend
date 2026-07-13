@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { News, NewsItem, newsType, newsTimeRange } from '../../../services/news';
+import { linkifyHtml } from '../../../shared/format';
 
 @Component({
   selector: 'app-notizia-dettaglio',
@@ -33,7 +34,7 @@ export class NotiziaDettaglio implements OnInit {
   // dimensioni delle immagini inserite dall'editor.
   readonly safeBody = computed<SafeHtml | null>(() => {
     const n = this.notizia();
-    return n ? this.sanitizer.bypassSecurityTrustHtml(n.body) : null;
+    return n ? this.sanitizer.bypassSecurityTrustHtml(linkifyHtml(n.body)) : null;
   });
 
   ngOnInit(): void {

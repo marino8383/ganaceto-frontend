@@ -35,3 +35,17 @@ body {
 
 // Titoli con il serif del brand
 h1, h2, h3, .font-serif { font-family: 'Fraunces', serif; }
+
+// Link "attivi" auto-rilevati nei contenuti (telefono, WhatsApp, url, email)
+.phone-group { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.phone-call {
+  font-weight: 700; color: var(--primary); text-decoration: none; white-space: nowrap;
+  &:hover { text-decoration: underline; }
+}
+.phone-wa {
+  display: inline-flex; align-items: center; white-space: nowrap;
+  font-size: .82em; font-weight: 700; text-decoration: none;
+  color: #128c7e; border: 1px solid #128c7e33; border-radius: 999px; padding: 1px 8px;
+  &:hover { background: #128c7e14; }
+}
+.content-link { color: var(--primary); word-break: break-word; }
