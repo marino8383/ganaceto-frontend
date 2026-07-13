@@ -4,7 +4,16 @@
 
   <!-- Nuovo messaggio (solo utenti loggati) -->
   @if (auth.isLoggedIn) {
+    @if (!composing()) {
+      <button class="compose-trigger" type="button" (click)="composing.set(true)">
+        ✏️ Scrivi un messaggio
+      </button>
+    } @else {
     <section class="postbox" aria-label="Scrivi un messaggio">
+      <div class="postbox-head">
+        <strong>Nuovo messaggio</strong>
+        <button class="close-x" type="button" (click)="composing.set(false)" aria-label="Chiudi">✕</button>
+      </div>
       <form [formGroup]="postForm" (ngSubmit)="pubblica()" novalidate>
         <textarea
           formControlName="testo"
@@ -59,6 +68,7 @@
         </div>
       </form>
     </section>
+    }
   } @else {
     <p class="login-prompt">🔒 Accedi con Google per scrivere sulla bacheca.</p>
   }
@@ -87,22 +97,25 @@
             {{ msg.userDisplayName }}
             @if (msg.isOwner) { <span class="badge-tuo">tuo</span> }
           </span>
+          <span class="head-actions">
+            @if (auth.isLoggedIn) {
+              <button
+                class="bell"
+                [class.on]="msg.isFollowing"
+                (click)="toggleFollow(msg)"
+                [attr.aria-pressed]="msg.isFollowing"
+                [title]="msg.isFollowing ? 'Segui questo thread — clicca per smettere' : 'Segui il thread per essere avvisato delle risposte'">
+                {{ msg.isFollowing ? '🔔' : '🔕' }}
+              </button>
+            }
+            @if (canDelete(msg)) {
+              <button class="del" (click)="elimina(msg)" [title]="msg.isOwner ? 'Elimina' : 'Rimuovi (moderatore)'">🗑</button>
+            }
+          </span>
+        </div>
+        <div class="mmeta">
           <span class="mtag" [style.background]="tipo(msg.tag).color">{{ tipo(msg.tag).icon }} {{ tipo(msg.tag).label }}</span>
           <time class="mtime" [attr.datetime]="msg.createdAt">{{ msg.createdAt | date: 'dd/MM HH:mm' }}</time>
-
-          @if (auth.isLoggedIn) {
-            <button
-              class="bell"
-              [class.on]="msg.isFollowing"
-              (click)="toggleFollow(msg)"
-              [attr.aria-pressed]="msg.isFollowing"
-              [title]="msg.isFollowing ? 'Segui questo thread — clicca per smettere' : 'Segui il thread per essere avvisato delle risposte'">
-              {{ msg.isFollowing ? '🔔' : '🔕' }}
-            </button>
-          }
-          @if (canDelete(msg)) {
-            <button class="del" (click)="elimina(msg)" [title]="msg.isOwner ? 'Elimina' : 'Rimuovi (moderatore)'">🗑</button>
-          }
         </div>
 
         @if (msg.testo) {

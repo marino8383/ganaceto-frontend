@@ -62,6 +62,7 @@ export class Bacheca implements OnInit {
     testo: ['', [Validators.required, Validators.maxLength(500)]],
   });
 
+  readonly composing = signal(false);
   readonly sending = signal(false);
   readonly error = signal<string | null>(null);
 
@@ -156,6 +157,7 @@ export class Bacheca implements OnInit {
           this.manualTag.set(null);
           this.photo.set(null);
           this.wantPos.set(false);
+          this.composing.set(false);
           this.sending.set(false);
           this.load();
         },
