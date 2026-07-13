@@ -22,6 +22,7 @@ export class Shell {
   readonly isLogged = computed(() => this.user() !== null);
   readonly isAdmin = computed(() => this.user()?.role === 'Admin');
   readonly initial = computed(() => (this.user()?.displayName ?? '?').charAt(0).toUpperCase());
+  readonly avatar = computed(() => this.user()?.profilePicture || null);
 
   // navigazione — Adesioni solo per utenti registrati
   private readonly allTabs: Tab[] = [

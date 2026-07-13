@@ -2,104 +2,164 @@
   <h1 class="page-title">Bacheca</h1>
   <p class="page-sub">Messaggi e comunicazioni dalla community di Ganaceto.</p>
 
-  <!-- Form nuovo messaggio (solo utenti loggati) -->
+  <!-- Nuovo messaggio (solo utenti loggati) -->
   @if (auth.isLoggedIn) {
-    @if (rispondendoA() === null) {
-      <section class="form-panel" aria-label="Scrivi un messaggio">
-        <form [formGroup]="form" (ngSubmit)="invia(null)" novalidate>
-          <div class="field">
-            <label for="testo-nuovo" class="sr-only">Scrivi un messaggio</label>
-            <textarea
-              id="testo-nuovo"
-              formControlName="testo"
-              rows="3"
-              maxlength="500"
-              placeholder="Scrivi un messaggio alla community…"
-              [attr.aria-invalid]="form.controls.testo.invalid && form.controls.testo.touched"
-            ></textarea>
-            <span class="char-count">{{ form.controls.testo.value.length }}/500</span>
-          </div>
-          @if (error()) {
-            <p class="form-error" role="alert">{{ error() }}</p>
-          }
-          <div class="form-actions">
-            <button class="btn-primary" type="submit" [disabled]="form.invalid || sending()">
-              {{ sending() ? 'Invio…' : 'Pubblica' }}
+    <section class="postbox" aria-label="Scrivi un messaggio">
+      <form [formGroup]="postForm" (ngSubmit)="pubblica()" novalidate>
+        <textarea
+          formControlName="testo"
+          rows="3"
+          maxlength="500"
+          placeholder="Scrivi un messaggio alla community…"
+        ></textarea>
+
+        <!-- Tag: scegli o lascia rilevare dal testo -->
+        <div class="tagsel" role="group" aria-label="Tipo di messaggio">
+          @for (t of tags; track t.value) {
+            <button
+              type="button"
+              class="tchip"
+              [class.on]="manualTag() === t.value"
+              [class.suggest]="manualTag() === null && autoTag() === t.value"
+              [style.--chip]="t.color"
+              (click)="selectTag(t.value)">
+              {{ t.icon }} {{ t.label }}
             </button>
+          }
+        </div>
+        <p class="hint">Scegli un tag, oppure lascia che venga rilevato dal testo (evidenziato).</p>
+
+        <!-- Anteprima foto -->
+        @if (photo(); as p) {
+          <div class="photo-prev">
+            <img [src]="p" alt="Anteprima foto" />
+            <button type="button" class="photo-x" (click)="clearPhoto()" aria-label="Rimuovi foto">✕</button>
           </div>
-        </form>
-      </section>
-    }
+        }
+
+        @if (error()) {
+          <p class="form-error" role="alert">{{ error() }}</p>
+        }
+
+        <div class="post-tools">
+          <label class="tool">
+            <input type="file" accept="image/*" capture="environment" hidden (change)="onPhoto($event)" />
+            📷 Scatta
+          </label>
+          <label class="tool">
+            <input type="file" accept="image/*" hidden (change)="onPhoto($event)" />
+            🖼️ Galleria
+          </label>
+          <button type="button" class="tool" [class.on]="wantPos()" (click)="togglePos()" [attr.aria-pressed]="wantPos()">
+            📍 Posizione
+          </button>
+          <button class="btn-primary" type="submit" [disabled]="sending() || posLoading()">
+            {{ posLoading() ? '📍…' : sending() ? 'Invio…' : 'Pubblica' }}
+          </button>
+        </div>
+      </form>
+    </section>
   } @else {
-    <p class="login-prompt">
-      Accedi con Google per scrivere sulla bacheca.
-    </p>
+    <p class="login-prompt">🔒 Accedi con Google per scrivere sulla bacheca.</p>
   }
 
+  <!-- Filtri per tag -->
+  <div class="tagfilter" role="group" aria-label="Filtra per tipo">
+    <button class="fchip" [class.on]="filter() === 'all'" (click)="setFilter('all')">Tutti</button>
+    @for (t of tags; track t.value) {
+      <button class="fchip" [class.on]="filter() === t.value" [style.--chip]="t.color" (click)="setFilter(t.value)">
+        {{ t.icon }} {{ t.label }}
+      </button>
+    }
+  </div>
+
   <!-- Lista messaggi -->
-  @if (messaggi().length === 0) {
-    <p class="empty-state">Nessun messaggio ancora. Sii il primo a scrivere!</p>
+  @if (filtered().length === 0) {
+    <p class="empty-state">Nessun messaggio{{ filter() !== 'all' ? ' per questo filtro' : ' ancora' }}.</p>
   }
 
   <ul class="messaggi-list" aria-label="Messaggi bacheca">
-    @for (msg of messaggi(); track msg.id) {
+    @for (msg of filtered(); track msg.id) {
       <li class="messaggio-card">
-        <div class="messaggio-header">
-          <span class="autore">{{ msg.userDisplayName }}</span>
-          <time class="data" [attr.datetime]="msg.createdAt">
-            {{ msg.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-          </time>
-          @if (auth.isAdmin) {
-            <button class="btn-elimina" type="button" (click)="elimina(msg.id)" aria-label="Elimina messaggio">🗑</button>
+        <div class="mhead">
+          <span class="avatar" aria-hidden="true">{{ msg.userDisplayName.charAt(0).toUpperCase() }}</span>
+          <span class="autore">
+            {{ msg.userDisplayName }}
+            @if (msg.isOwner) { <span class="badge-tuo">tuo</span> }
+          </span>
+          <span class="mtag" [style.background]="tipo(msg.tag).color">{{ tipo(msg.tag).icon }} {{ tipo(msg.tag).label }}</span>
+          <time class="mtime" [attr.datetime]="msg.createdAt">{{ msg.createdAt | date: 'dd/MM HH:mm' }}</time>
+
+          @if (auth.isLoggedIn) {
+            <button
+              class="bell"
+              [class.on]="msg.isFollowing"
+              (click)="toggleFollow(msg)"
+              [attr.aria-pressed]="msg.isFollowing"
+              [title]="msg.isFollowing ? 'Segui questo thread — clicca per smettere' : 'Segui il thread per essere avvisato delle risposte'">
+              {{ msg.isFollowing ? '🔔' : '🔕' }}
+            </button>
+          }
+          @if (canDelete(msg)) {
+            <button class="del" (click)="elimina(msg)" [title]="msg.isOwner ? 'Elimina' : 'Rimuovi (moderatore)'">🗑</button>
           }
         </div>
 
-        <p class="messaggio-testo">{{ msg.testo }}</p>
+        @if (msg.testo) {
+          <p class="mtext">{{ msg.testo }}</p>
+        }
+
+        @if (msg.photoUrl) {
+          <img class="msg-foto" [src]="msg.photoUrl" alt="Foto allegata" />
+        }
+
+        @if (msg.latitude !== null && msg.longitude !== null) {
+          <div class="msg-map-wrap">
+            <iframe
+              class="msg-map"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+              title="Mappa posizione"
+              [src]="mapUrl(msg.latitude, msg.longitude)"></iframe>
+            <a class="msg-pos" [href]="mapsLink(msg.latitude, msg.longitude)" target="_blank" rel="noopener">
+              📍 Apri su Google Maps
+            </a>
+          </div>
+        }
 
         <!-- Risposte -->
         @if (msg.risposte.length > 0) {
           <ul class="risposte-list" aria-label="Risposte">
             @for (r of msg.risposte; track r.id) {
-              <li class="risposta-card">
-                <div class="messaggio-header">
-                  <span class="autore">{{ r.userDisplayName }}</span>
-                  <time class="data" [attr.datetime]="r.createdAt">
-                    {{ r.createdAt | date: 'dd/MM/yyyy HH:mm' }}
-                  </time>
-                  @if (auth.isAdmin) {
-                    <button class="btn-elimina" type="button" (click)="elimina(r.id)" aria-label="Elimina risposta">🗑</button>
+              <li class="risposta">
+                <div class="mhead">
+                  <span class="avatar g" aria-hidden="true">{{ r.userDisplayName.charAt(0).toUpperCase() }}</span>
+                  <span class="autore">{{ r.userDisplayName }}@if (r.isOwner) { <span class="badge-tuo">tuo</span> }</span>
+                  <time class="mtime" [attr.datetime]="r.createdAt">{{ r.createdAt | date: 'dd/MM HH:mm' }}</time>
+                  @if (canDelete(r)) {
+                    <button class="del" (click)="eliminaRisposta(r.id)" title="Elimina">🗑</button>
                   }
                 </div>
-                <p class="messaggio-testo">{{ r.testo }}</p>
+                <p class="mtext">{{ r.testo }}</p>
               </li>
             }
           </ul>
         }
 
-        <!-- Form risposta inline -->
+        <!-- Box risposta -->
         @if (auth.isLoggedIn) {
           @if (rispondendoA() === msg.id) {
-            <form class="form-risposta" [formGroup]="form" (ngSubmit)="invia(msg.id)" novalidate>
-              <label [for]="'testo-risposta-' + msg.id" class="sr-only">Rispondi a {{ msg.userDisplayName }}</label>
-              <textarea
-                [id]="'testo-risposta-' + msg.id"
-                formControlName="testo"
-                rows="2"
-                maxlength="500"
-                placeholder="Scrivi una risposta…"
-              ></textarea>
-              @if (error()) {
-                <p class="form-error" role="alert">{{ error() }}</p>
-              }
-              <div class="form-actions">
+            <form class="reply-form" [formGroup]="replyForm" (ngSubmit)="inviaRisposta(msg.id)" novalidate>
+              <textarea formControlName="testo" rows="2" maxlength="500" placeholder="Scrivi una risposta…"></textarea>
+              <div class="reply-actions">
                 <button class="btn-secondary" type="button" (click)="annullaRisposta()">Annulla</button>
-                <button class="btn-primary" type="submit" [disabled]="form.invalid || sending()">
+                <button class="btn-primary" type="submit" [disabled]="replyForm.invalid || sending()">
                   {{ sending() ? 'Invio…' : 'Rispondi' }}
                 </button>
               </div>
             </form>
-          } @else if (rispondendoA() === null) {
-            <button class="btn-rispondi" type="button" (click)="rispondi(msg.id)">Rispondi</button>
+          } @else {
+            <button class="linkbtn" type="button" (click)="rispondi(msg.id)">↩ Rispondi</button>
           }
         }
       </li>

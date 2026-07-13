@@ -14,9 +14,16 @@
       class="pbtn"
       [class.user]="isLogged() && !isAdmin()"
       [class.admin]="isAdmin()"
+      [class.has-img]="!!avatar()"
       (click)="openProfilo()"
       aria-label="Profilo">
-      @if (isLogged()) { {{ initial() }} } @else { 👤 }
+      @if (isLogged()) {
+        @if (avatar(); as img) {
+          <img [src]="img" alt="" referrerpolicy="no-referrer" />
+        } @else {
+          {{ initial() }}
+        }
+      } @else { 👤 }
     </button>
   </header>
 
