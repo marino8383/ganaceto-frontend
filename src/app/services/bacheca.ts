@@ -52,19 +52,19 @@ export interface BachecaType {
 // Classificazione dei messaggi + parole chiave per l'auto-rilevamento (dal mockup).
 export const BACHECA_TAGS: BachecaType[] = [
   {
-    value: 'ControlloVicinato', label: 'Controllo Vicinato', icon: 'C', color: '#47617e',
+    value: 'ControlloVicinato', label: 'Controllo Vicinato', icon: '👁️', color: '#47617e',
     kw: ['controllo', 'vicinato', 'sospett', 'ladr', 'furto', 'rubat', 'estran', 'sicurezza', 'ubriac', 'casino', 'confusione', 'schiamazz', 'rumore'],
   },
   {
-    value: 'Segnalazione', label: 'Segnalazione', icon: 'S', color: '#c0632f',
+    value: 'Segnalazione', label: 'Segnalazione', icon: '🔧', color: '#c0632f',
     kw: ['segnal', 'guast', 'rotto', 'danneggiat', 'perdita', 'degrado', 'rifiut', 'abbandon', 'immondizia', 'discarica'],
   },
   {
-    value: 'Viabilita', label: 'Viabilità', icon: 'V', color: '#b3402f',
+    value: 'Viabilita', label: 'Viabilità', icon: '🚧', color: '#b3402f',
     kw: ['strada', 'via', 'traffico', 'parcheggi', 'viabilit', 'buca', 'semaforo', 'lavori', 'chiusur', 'incidente', 'nazionale', 'statale', 'provinciale', 'auto', 'camion', 'veloc', 'autostrada', 'tamponament', 'scontro', 'sinistro', 'coda', 'rallentament', 'rotonda', 'svincolo', 'deviazione', 'allagat'],
   },
   {
-    value: 'Parrocchia', label: 'Parrocchia', icon: '+', color: '#7a5a8a',
+    value: 'Parrocchia', label: 'Parrocchia', icon: '⛪', color: '#7a5a8a',
     kw: ['messa', 'parrocchia', 'chiesa', 'don ', 'catechism', 'oratorio', 'rosario', 'battesim', 'funeral'],
   },
   {
@@ -72,7 +72,7 @@ export const BACHECA_TAGS: BachecaType[] = [
     kw: ['calcio', 'partita', 'torneo', 'squadra', 'pallone', 'campionato', 'allenament', 'trofeo', 'gol', 'goal', 'mister', 'ganaceto calcio'],
   },
   {
-    value: 'Info', label: 'Richiesta info', icon: 'I', color: '#7a5a3a',
+    value: 'Info', label: 'Richiesta info', icon: '❓', color: '#7a5a3a',
     kw: ['qualcuno sa', 'informazion', 'come si', 'sapete', 'vorrei sapere', 'chiedo', 'cercasi', 'cerco'],
   },
 ];
