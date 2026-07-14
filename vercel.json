@@ -4,6 +4,7 @@
   "outputDirectory": "dist/ganaceto-frontend/browser",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://ganaceto-api.onrender.com/api/:path*" },
+    { "source": "/s/:path*", "destination": "https://ganaceto-api.onrender.com/s/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

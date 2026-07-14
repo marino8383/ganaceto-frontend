@@ -9,7 +9,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { News, NewsItem, newsType, newsTimeRange } from '../../../services/news';
+import { News, NewsItem, newsType, newsTimeRange, externalChannelLabel } from '../../../services/news';
 import { renderNewsBody } from '../../../shared/format';
 
 @Component({
@@ -28,6 +28,23 @@ export class NotiziaDettaglio implements OnInit {
   readonly errore = signal(false);
   readonly tipo = newsType;
   readonly orario = newsTimeRange;
+  readonly channelLabel = externalChannelLabel;
+  readonly copied = signal(false);
+
+  // Condivisione: usa il menu nativo del dispositivo se disponibile, altrimenti
+  // copia il link (che punta alla pagina "vetrina" con l'anteprima social).
+  async share(n: NewsItem): Promise<void> {
+    const url = `${location.origin}/s/notizie/${n.id}`;
+    if (navigator.share) {
+      try { await navigator.share({ title: n.title, text: n.title, url }); } catch { /* annullato */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        this.copied.set(true);
+        setTimeout(() => this.copied.set(false), 2000);
+      } catch { /* clipboard non disponibile */ }
+    }
+  }
 
   // Il corpo è HTML scritto SOLO dall'admin (rotta protetta + ruolo Admin lato
   // server): lo rendiamo come HTML fidato per preservare formattazione e

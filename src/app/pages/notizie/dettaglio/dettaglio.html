@@ -23,6 +23,19 @@
 
     <div class="dettaglio-body" [innerHTML]="safeBody()" aria-label="Contenuto notizia"></div>
 
+    @if (n.externalUrl) {
+      <a class="ext-link" [href]="n.externalUrl" target="_blank" rel="noopener">
+        <span class="material-icons" aria-hidden="true">open_in_new</span> {{ channelLabel(n.externalUrl) }}
+      </a>
+    }
+
+    <div class="dettaglio-actions">
+      <button class="share-btn" type="button" (click)="share(n)">
+        <span class="material-icons" aria-hidden="true">share</span>
+        {{ copied() ? 'Link copiato!' : 'Condividi' }}
+      </button>
+    </div>
+
     <time class="pub-date" [attr.datetime]="n.publishedAt">Pubblicata il {{ n.publishedAt | date: 'dd/MM/yyyy HH:mm' }}</time>
   </article>
 } @else {

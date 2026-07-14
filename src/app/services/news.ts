@@ -42,6 +42,7 @@ export interface NewsItem {
   startTime: string | null; // "HH:mm"
   endTime: string | null; // "HH:mm"
   coverSize: CoverSize | null;
+  externalUrl: string | null;
 }
 
 export interface CreateNewsDto {
@@ -54,6 +55,7 @@ export interface CreateNewsDto {
   startTime: string | null;
   endTime: string | null;
   coverSize: CoverSize | null;
+  externalUrl: string | null;
 }
 
 export interface UpdateNewsDto {
@@ -67,6 +69,16 @@ export interface UpdateNewsDto {
   startTime: string | null;
   endTime: string | null;
   coverSize: CoverSize | null;
+  externalUrl: string | null;
+}
+
+/** Etichetta del bottone in base al canale del link esterno. */
+export function externalChannelLabel(url: string): string {
+  const u = (url || '').toLowerCase();
+  if (u.includes('facebook.') || u.includes('fb.me') || u.includes('fb.watch')) return 'Apri su Facebook';
+  if (u.includes('instagram.')) return 'Apri su Instagram';
+  if (u.includes('wa.me') || u.includes('whatsapp.') || u.includes('chat.whatsapp')) return 'Apri su WhatsApp';
+  return 'Apri il post originale';
 }
 
 /** Fascia oraria leggibile: "9:00–10:00", "dalle 9:00", oppure "" */

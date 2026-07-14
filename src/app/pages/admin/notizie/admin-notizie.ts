@@ -68,6 +68,7 @@ export class AdminNotizie implements OnInit {
     startTime: [''],
     endTime: [''],
     coverSize: ['medium' as CoverSize],
+    externalUrl: [''],
   });
 
   ngOnInit(): void {
@@ -77,7 +78,7 @@ export class AdminNotizie implements OnInit {
   openCreate(): void {
     this.form.reset({
       title: '', body: '', tag: 'Evento', isVisible: true, expandedInHome: false,
-      referenceDate: '', startTime: '', endTime: '', coverSize: 'medium',
+      referenceDate: '', startTime: '', endTime: '', coverSize: 'medium', externalUrl: '',
     });
     this.cover.set(null);
     this.editingId.set(null);
@@ -96,6 +97,7 @@ export class AdminNotizie implements OnInit {
       startTime: item.startTime ?? '',
       endTime: item.endTime ?? '',
       coverSize: item.coverSize ?? 'medium',
+      externalUrl: item.externalUrl ?? '',
     });
     this.cover.set(item.coverImageUrl);
     this.editingId.set(item.id);
@@ -145,6 +147,7 @@ export class AdminNotizie implements OnInit {
       startTime: raw.startTime || null,
       endTime: raw.endTime || null,
       coverSize: raw.coverSize,
+      externalUrl: raw.externalUrl.trim() || null,
     };
 
     this.saving.set(true);
@@ -188,6 +191,7 @@ export class AdminNotizie implements OnInit {
         startTime: item.startTime,
         endTime: item.endTime,
         coverSize: item.coverSize,
+        externalUrl: item.externalUrl,
       })
       .subscribe({ next: () => this.newsService.loadAdminNotizie() });
   }
