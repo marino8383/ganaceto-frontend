@@ -114,6 +114,9 @@
   font-size: 0.86rem;
   line-height: 1.25;
 }
+.update-bar { background: var(--primary-container); }
+.update-bar .ib-icon { color: var(--primary); }
+.update-bar .ib-btn { background: var(--primary); }
 .ib-icon { font-size: 22px; color: var(--accent); flex-shrink: 0; }
 .ib-text { flex: 1; min-width: 0; }
 .ib-btn {

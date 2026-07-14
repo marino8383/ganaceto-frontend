@@ -38,6 +38,15 @@
     </button>
   </header>
 
+  <!-- Barra aggiornamento app (PWA) -->
+  @if (updateReady()) {
+    <div class="install-bar update-bar">
+      <span class="ib-icon material-icons" aria-hidden="true">refresh</span>
+      <span class="ib-text">È disponibile una nuova versione dell'app</span>
+      <button class="ib-btn" type="button" (click)="applyUpdate()">Aggiorna</button>
+    </div>
+  }
+
   <!-- Barra installa app (PWA) -->
   @if (install.show) {
     <div class="install-bar">

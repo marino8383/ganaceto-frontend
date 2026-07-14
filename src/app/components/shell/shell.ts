@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ProfiloSheet } from '../profilo-sheet/profilo-sheet';
 import { NotificheSheet } from '../notifiche-sheet/notifiche-sheet';
+import { SwUpdate } from '@angular/service-worker';
 import { Auth } from '../../services/auth';
 import { Notifiche } from '../../services/notifiche';
 import { InstallService } from '../../services/install';
@@ -21,6 +22,10 @@ export class Shell {
   private readonly auth = inject(Auth);
   private readonly notifiche = inject(Notifiche);
   readonly install = inject(InstallService);
+  private readonly swUpdate = inject(SwUpdate);
+
+  // nuova versione dell'app pronta (mostra la barra "Aggiorna")
+  readonly updateReady = signal(false);
 
   // stato utente (reattivo)
   readonly user = this.auth.user;
@@ -71,11 +76,19 @@ export class Shell {
       if (this.isLogged()) this.notifiche.refreshCount();
     }, 30000);
 
-    // reattività: ricontrolla le notifiche appena l'app torna in primo piano
+    // controllo aggiornamenti PWA: segnala quando una nuova versione è pronta
+    if (this.swUpdate.isEnabled) {
+      this.swUpdate.versionUpdates.subscribe((ev) => {
+        if (ev.type === 'VERSION_READY') this.updateReady.set(true);
+      });
+      this.swUpdate.checkForUpdate().catch(() => {});
+    }
+
+    // reattività: ricontrolla notifiche e aggiornamenti quando l'app torna in primo piano
     const onVisible = () => {
-      if (document.visibilityState === 'visible' && this.isLogged()) {
-        this.notifiche.refreshCount();
-      }
+      if (document.visibilityState !== 'visible') return;
+      if (this.isLogged()) this.notifiche.refreshCount();
+      if (this.swUpdate.isEnabled) this.swUpdate.checkForUpdate().catch(() => {});
     };
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('focus', onVisible);
@@ -88,6 +101,10 @@ export class Shell {
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onVisible);
     });
+  }
+
+  applyUpdate(): void {
+    this.swUpdate.activateUpdate().then(() => document.location.reload());
   }
 
   toggleOnlineTip(): void {
