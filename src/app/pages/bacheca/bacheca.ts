@@ -37,7 +37,9 @@ export class Bacheca implements OnInit {
   readonly tags = BACHECA_TAGS;
   readonly tipo = bachecaTag;
 
-  readonly messaggi = signal<MessaggioBacheca[]>([]);
+  // stato condiviso dal servizio (persiste tra le navigazioni)
+  readonly messaggi = this.api.messaggi;
+  readonly loading = this.api.loading;
   readonly filter = signal<BachecaTag | 'all'>('all');
   readonly filtered = computed(() => {
     const f = this.filter();
@@ -74,7 +76,7 @@ export class Bacheca implements OnInit {
   }
 
   private load(): void {
-    this.api.getAll().subscribe({ next: (items) => this.messaggi.set(items) });
+    this.api.load();
   }
 
   setFilter(f: BachecaTag | 'all'): void {
@@ -226,13 +228,9 @@ export class Bacheca implements OnInit {
 
   // --- follow (campanella) ---
   toggleFollow(msg: MessaggioBacheca): void {
+    const target = !msg.isFollowing;
     const req = msg.isFollowing ? this.api.unfollow(msg.id) : this.api.follow(msg.id);
-    req.subscribe({
-      next: () =>
-        this.messaggi.update((list) =>
-          list.map((m) => (m.id === msg.id ? { ...m, isFollowing: !m.isFollowing } : m)),
-        ),
-    });
+    req.subscribe({ next: () => this.api.setFollowing(msg.id, target) });
   }
 
   // --- mini-mappa posizione ---

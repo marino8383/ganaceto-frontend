@@ -93,6 +93,32 @@ export class BachecaService {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE_URL);
 
+  // stato condiviso: persiste tra le navigazioni → al ritorno la lista è già pronta
+  private readonly _messaggi = signal<MessaggioBacheca[]>([]);
+  readonly messaggi = this._messaggi.asReadonly();
+  readonly loading = signal(false);
+  private loadedOnce = false;
+
+  // Carica i messaggi. Mostra il caricamento solo la prima volta (dopo è in background).
+  load(): void {
+    if (!this.loadedOnce) this.loading.set(true);
+    this.http.get<MessaggioBacheca[]>(`${this.base}/api/bacheca`).subscribe({
+      next: (items) => {
+        this._messaggi.set(items);
+        this.loadedOnce = true;
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false),
+    });
+  }
+
+  // aggiorna localmente lo stato "segui" di un thread (ottimistico)
+  setFollowing(id: number, following: boolean): void {
+    this._messaggi.update((list) =>
+      list.map((m) => (m.id === id ? { ...m, isFollowing: following } : m)),
+    );
+  }
+
   getAll() {
     return this.http.get<MessaggioBacheca[]>(`${this.base}/api/bacheca`);
   }
