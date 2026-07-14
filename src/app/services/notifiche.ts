@@ -26,7 +26,23 @@ export class Notifiche {
   refreshCount(): void {
     this.http
       .get<{ count: number }>(`${this.base}/api/notifications/unread-count`)
-      .subscribe({ next: (r) => this.unread.set(r.count), error: () => {} });
+      .subscribe({
+        next: (r) => {
+          this.unread.set(r.count);
+          this.syncBadge(r.count);
+        },
+        error: () => {},
+      });
+  }
+
+  // Badge numerico sull'icona dell'app (App Badging API; Android/desktop, non iOS)
+  private syncBadge(count: number): void {
+    const nav = navigator as Navigator & {
+      setAppBadge?: (n?: number) => Promise<void>;
+      clearAppBadge?: () => Promise<void>;
+    };
+    if (count > 0) nav.setAppBadge?.(count).catch(() => {});
+    else nav.clearAppBadge?.().catch(() => {});
   }
 
   // Carica l'elenco e poi segna tutto come letto (l'evidenza dei "nuovi" resta per questa apertura).
@@ -36,7 +52,10 @@ export class Notifiche {
         this._list.set(items);
         if (items.some((n) => !n.read)) {
           this.http.post(`${this.base}/api/notifications/read-all`, {}).subscribe({
-            next: () => this.unread.set(0),
+            next: () => {
+              this.unread.set(0);
+              this.syncBadge(0);
+            },
             error: () => {},
           });
         }
@@ -47,5 +66,6 @@ export class Notifiche {
   reset(): void {
     this._list.set([]);
     this.unread.set(0);
+    this.syncBadge(0);
   }
 }
