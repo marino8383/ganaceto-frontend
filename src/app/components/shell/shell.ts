@@ -62,13 +62,24 @@ export class Shell {
     });
     const notifTimer = setInterval(() => {
       if (this.isLogged()) this.notifiche.refreshCount();
-    }, 60000);
+    }, 30000);
+
+    // reattività: ricontrolla le notifiche appena l'app torna in primo piano
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && this.isLogged()) {
+        this.notifiche.refreshCount();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
 
     inject(DestroyRef).onDestroy(() => {
       clearInterval(onlineTimer);
       clearInterval(notifTimer);
       clearTimeout(splashTimer);
       clearTimeout(this.tipTimer);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
     });
   }
 
