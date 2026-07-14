@@ -94,6 +94,7 @@ textarea {
 
   &:hover { background: var(--primary-container); }
   &.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .material-icons { font-size: 18px; }
 }
 
 .btn-primary {
@@ -187,6 +188,7 @@ textarea {
   justify-content: center;
   z-index: 30;
   transition: transform .12s ease;
+  .material-icons { font-size: 26px; }
   &:hover { transform: scale(1.06); }
   &:active { transform: scale(.96); }
 }
@@ -238,8 +240,9 @@ textarea {
 }
 .del { color: var(--muted); &:hover { color: var(--danger); background: var(--danger-soft); } }
 .del .material-icons { font-size: 19px; }
-.bell { filter: grayscale(1); opacity: .6; }
-.bell.on { filter: none; opacity: 1; }
+.bell { color: var(--muted); }
+.bell.on { color: var(--primary); }
+.bell .material-icons { font-size: 20px; }
 
 .mtext { margin: 10px 0 0; font-size: 0.94rem; line-height: 1.55; color: var(--text); white-space: pre-wrap; }
 

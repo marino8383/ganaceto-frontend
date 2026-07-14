@@ -47,14 +47,14 @@
         <div class="post-tools">
           <label class="tool">
             <input type="file" accept="image/*" capture="environment" hidden (change)="onPhoto($event)" />
-            📷 Scatta
+            <span class="material-icons" aria-hidden="true">photo_camera</span> Scatta
           </label>
           <label class="tool">
             <input type="file" accept="image/*" hidden (change)="onPhoto($event)" />
-            🖼️ Galleria
+            <span class="material-icons" aria-hidden="true">photo_library</span> Galleria
           </label>
           <button type="button" class="tool" [class.on]="wantPos()" (click)="togglePos()" [attr.aria-pressed]="wantPos()">
-            📍 Posizione
+            <span class="material-icons" aria-hidden="true">location_on</span> Posizione
           </button>
           <button class="btn-primary" type="submit" [disabled]="sending() || posLoading()">
             {{ posLoading() ? '📍…' : sending() ? 'Invio…' : 'Pubblica' }}
@@ -99,7 +99,7 @@
                 (click)="toggleFollow(msg)"
                 [attr.aria-pressed]="msg.isFollowing"
                 [title]="msg.isFollowing ? 'Segui questo thread — clicca per smettere' : 'Segui il thread per essere avvisato delle risposte'">
-                {{ msg.isFollowing ? '🔔' : '🔕' }}
+                <span class="material-icons" aria-hidden="true">{{ msg.isFollowing ? 'notifications_active' : 'notifications_none' }}</span>
               </button>
             }
             @if (canDelete(msg)) {
@@ -178,6 +178,6 @@
 
   <!-- Pulsante flottante: scrivi un nuovo messaggio -->
   @if (auth.isLoggedIn && !composing()) {
-    <button class="fab" type="button" (click)="composing.set(true)" aria-label="Scrivi un messaggio" title="Scrivi un messaggio">✏️</button>
+    <button class="fab" type="button" (click)="composing.set(true)" aria-label="Scrivi un messaggio" title="Scrivi un messaggio"><span class="material-icons" aria-hidden="true">edit</span></button>
   }
 </div>

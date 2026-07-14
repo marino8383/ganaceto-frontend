@@ -94,6 +94,11 @@
   &:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 }
 
+/* dimensioni icone Material nei vari contesti */
+.app-header .material-icons { font-size: 21px; }
+.tab .ico.material-icons { font-size: 25px; }
+.side-item .ic.material-icons { font-size: 21px; }
+
 /* ── Corpo ──────────────────────────────────────────── */
 .body { flex: 1; min-height: 0; display: flex; }
 .main { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }

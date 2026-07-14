@@ -32,11 +32,11 @@ export class Shell {
 
   // navigazione — Adesioni solo per utenti registrati
   private readonly allTabs: Tab[] = [
-    { path: '/notizie', label: 'Notizie', icon: '📋' },
-    { path: '/casina', label: 'Casina', icon: '🏠' },
-    { path: '/adesioni', label: 'Adesioni', icon: '✋', authOnly: true },
-    { path: '/bacheca', label: 'Bacheca', icon: '💬' },
-    { path: '/chi-siamo', label: 'Chi siamo', icon: 'ℹ️' },
+    { path: '/notizie', label: 'Notizie', icon: 'campaign' },
+    { path: '/casina', label: 'Casina', icon: 'home' },
+    { path: '/adesioni', label: 'Adesioni', icon: 'how_to_reg', authOnly: true },
+    { path: '/bacheca', label: 'Bacheca', icon: 'forum' },
+    { path: '/chi-siamo', label: 'Chi siamo', icon: 'info' },
   ];
   readonly tabs = computed(() => this.allTabs.filter((t) => !t.authOnly || this.isLogged()));
 

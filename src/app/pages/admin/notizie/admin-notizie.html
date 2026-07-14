@@ -130,9 +130,9 @@
         <div class="news-actions">
           <button class="btn-icon" type="button" (click)="toggleVisibility(item)"
             [attr.aria-label]="item.isVisible ? 'Nascondi' : 'Rendi visibile'">
-            {{ item.isVisible ? '👁' : '🚫' }}
+            <span class="material-icons" aria-hidden="true">{{ item.isVisible ? 'visibility' : 'visibility_off' }}</span>
           </button>
-          <button class="btn-icon" type="button" (click)="openEdit(item)" aria-label="Modifica">✏️</button>
+          <button class="btn-icon" type="button" (click)="openEdit(item)" aria-label="Modifica"><span class="material-icons" aria-hidden="true">edit</span></button>
           <button class="btn-icon btn-danger" type="button" (click)="delete(item)" aria-label="Elimina"><span class="material-icons" aria-hidden="true">delete_outline</span></button>
         </div>
       </li>

@@ -15,7 +15,7 @@
     </button>
     @if (isLogged()) {
       <button class="bellbtn" (click)="openNotifiche()" aria-label="Notifiche" title="Notifiche">
-        <span aria-hidden="true">🔔</span>
+        <span class="material-icons" aria-hidden="true">notifications</span>
         @if (unread() > 0) {
           <span class="bell-badge">{{ unread() > 9 ? '9+' : unread() }}</span>
         }
@@ -34,7 +34,7 @@
         } @else {
           {{ initial() }}
         }
-      } @else { 👤 }
+      } @else { <span class="material-icons" aria-hidden="true">person</span> }
     </button>
   </header>
 
@@ -43,14 +43,14 @@
     <nav class="sidebar" aria-label="Navigazione">
       @for (t of tabs(); track t.path) {
         <a class="side-item" [routerLink]="t.path" routerLinkActive="active">
-          <span class="ic">{{ t.icon }}</span><span class="lbl">{{ t.label }}</span>
+          <span class="ic material-icons">{{ t.icon }}</span><span class="lbl">{{ t.label }}</span>
         </a>
       }
       @if (isAdmin()) {
         <div class="side-sep"></div>
         <div class="side-lbl">Amministrazione</div>
         <a class="side-item" routerLink="/admin/notizie" routerLinkActive="active">
-          <span class="ic">🛠️</span><span class="lbl">Gestione notizie</span>
+          <span class="ic material-icons">edit</span><span class="lbl">Gestione notizie</span>
         </a>
       }
     </nav>
@@ -64,7 +64,7 @@
   <nav class="tabbar" aria-label="Navigazione">
     @for (t of tabs(); track t.path) {
       <a class="tab" [routerLink]="t.path" routerLinkActive="active" [title]="t.label" [attr.aria-label]="t.label">
-        <span class="ico">{{ t.icon }}</span>
+        <span class="ico material-icons">{{ t.icon }}</span>
       </a>
     }
   </nav>
