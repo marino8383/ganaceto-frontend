@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ProfiloSheet } from '../profilo-sheet/profilo-sheet';
+import { NotificheSheet } from '../notifiche-sheet/notifiche-sheet';
 import { Auth } from '../../services/auth';
+import { Notifiche } from '../../services/notifiche';
 
 interface Tab { path: string; label: string; icon: string; authOnly?: boolean; }
 
@@ -16,6 +18,7 @@ interface Tab { path: string; label: string; icon: string; authOnly?: boolean; }
 export class Shell {
   private readonly bottomSheet = inject(MatBottomSheet);
   private readonly auth = inject(Auth);
+  private readonly notifiche = inject(Notifiche);
 
   // stato utente (reattivo)
   readonly user = this.auth.user;
@@ -23,6 +26,9 @@ export class Shell {
   readonly isAdmin = computed(() => this.user()?.role === 'Admin');
   readonly initial = computed(() => (this.user()?.displayName ?? '?').charAt(0).toUpperCase());
   readonly avatar = computed(() => this.user()?.profilePicture || null);
+
+  // notifiche (campanello)
+  readonly unread = this.notifiche.unread;
 
   // navigazione — Adesioni solo per utenti registrati
   private readonly allTabs: Tab[] = [
@@ -44,14 +50,29 @@ export class Shell {
     this.tickOnline();
     const onlineTimer = setInterval(() => this.tickOnline(), 16000);
     const splashTimer = setTimeout(() => this.splashVisible.set(false), 2200);
+
+    // aggiorna il contatore notifiche al login e periodicamente
+    effect(() => {
+      if (this.isLogged()) this.notifiche.refreshCount();
+      else this.notifiche.reset();
+    });
+    const notifTimer = setInterval(() => {
+      if (this.isLogged()) this.notifiche.refreshCount();
+    }, 60000);
+
     inject(DestroyRef).onDestroy(() => {
       clearInterval(onlineTimer);
+      clearInterval(notifTimer);
       clearTimeout(splashTimer);
     });
   }
 
   openProfilo(): void {
     this.bottomSheet.open(ProfiloSheet);
+  }
+
+  openNotifiche(): void {
+    this.bottomSheet.open(NotificheSheet);
   }
 
   hideSplash(): void {

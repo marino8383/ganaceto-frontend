@@ -10,6 +10,14 @@
     <span class="online-pill" title="Persone online ora">
       <span class="op-dot"></span>{{ online() }}<span class="op-lbl">&nbsp;online</span>
     </span>
+    @if (isLogged()) {
+      <button class="bellbtn" (click)="openNotifiche()" aria-label="Notifiche" title="Notifiche">
+        <span aria-hidden="true">🔔</span>
+        @if (unread() > 0) {
+          <span class="bell-badge">{{ unread() > 9 ? '9+' : unread() }}</span>
+        }
+      </button>
+    }
     <button
       class="pbtn"
       [class.user]="isLogged() && !isAdmin()"

@@ -1,0 +1,24 @@
+<div class="sheet">
+  <div class="sheet-head">
+    <strong>Notifiche</strong>
+    <button class="close-x" type="button" (click)="chiudi()" aria-label="Chiudi">✕</button>
+  </div>
+
+  @if (notifiche.list().length === 0) {
+    <p class="empty">Nessuna notifica. 🌿</p>
+  } @else {
+    <ul class="notif-list">
+      @for (n of notifiche.list(); track n.id) {
+        <li class="notif" [class.unread]="!n.read" (click)="apri(n)">
+          <span class="ic" aria-hidden="true">{{ icon(n.kind) }}</span>
+          <div class="body">
+            <p class="title">{{ n.title }}</p>
+            @if (n.body) { <p class="sub">{{ n.body }}</p> }
+            <time class="when" [attr.datetime]="n.createdAt">{{ n.createdAt | date: 'dd/MM HH:mm' }}</time>
+          </div>
+          @if (n.link) { <span class="chev" aria-hidden="true">›</span> }
+        </li>
+      }
+    </ul>
+  }
+</div>
