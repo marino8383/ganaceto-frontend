@@ -10,6 +10,7 @@ import {
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { RouterLink } from '@angular/router';
 import { Auth } from '../../services/auth';
+import { Push } from '../../services/push';
 
 declare const google: {
   accounts: {
@@ -33,8 +34,17 @@ const GOOGLE_CLIENT_ID =
 export class ProfiloSheet {
   private readonly sheetRef = inject(MatBottomSheetRef<ProfiloSheet>);
   readonly auth = inject(Auth);
+  readonly push = inject(Push);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
+
+  async togglePush(): Promise<void> {
+    if (this.push.subscribed()) {
+      await this.push.disable();
+    } else {
+      await this.push.enable();
+    }
+  }
 
   private readonly googleBtnEl = viewChild<ElementRef<HTMLDivElement>>('googleBtn');
 

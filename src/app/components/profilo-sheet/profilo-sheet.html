@@ -19,9 +19,16 @@
       </div>
     </div>
 
+    @if (push.supported) {
+      <button class="notif-btn" [class.on]="push.subscribed()" (click)="togglePush()" [disabled]="push.busy()">
+        <span class="material-icons" aria-hidden="true">{{ push.subscribed() ? 'notifications_active' : 'notifications' }}</span>
+        <span>{{ push.busy() ? 'Attendere…' : (push.subscribed() ? 'Notifiche attive · disattiva' : 'Attiva le notifiche') }}</span>
+      </button>
+    }
+
     @if (auth.isAdmin) {
       <a class="admin-link" routerLink="/admin/notizie" (click)="close()">
-        ✏️ Gestisci notizie
+        <span class="material-icons" aria-hidden="true">edit</span> Gestisci notizie
       </a>
     }
 
