@@ -46,33 +46,34 @@ export interface BachecaType {
   label: string;
   icon: string;
   color: string;
+  text: string; // colore del testo/lettera sopra il colore (bianco o scuro)
   kw: string[];
 }
 
 // Classificazione dei messaggi + parole chiave per l'auto-rilevamento (dal mockup).
 export const BACHECA_TAGS: BachecaType[] = [
   {
-    value: 'ControlloVicinato', label: 'Controllo Vicinato', icon: '👁️', color: '#47617e',
+    value: 'ControlloVicinato', label: 'Controllo Vicinato', icon: '👁️', color: '#f5c518', text: '#4a3b00',
     kw: ['controllo', 'vicinato', 'sospett', 'ladr', 'furto', 'rubat', 'estran', 'sicurezza', 'ubriac', 'casino', 'confusione', 'schiamazz', 'rumore'],
   },
   {
-    value: 'Segnalazione', label: 'Segnalazione', icon: '🔧', color: '#c0632f',
+    value: 'Segnalazione', label: 'Segnalazione', icon: '🔧', color: '#d32f2f', text: '#ffffff',
     kw: ['segnal', 'guast', 'rotto', 'danneggiat', 'perdita', 'degrado', 'rifiut', 'abbandon', 'immondizia', 'discarica'],
   },
   {
-    value: 'Viabilita', label: 'Viabilità', icon: '🚧', color: '#b3402f',
+    value: 'Viabilita', label: 'Viabilità', icon: '🚧', color: '#1e6fd0', text: '#ffffff',
     kw: ['strada', 'via', 'traffico', 'parcheggi', 'viabilit', 'buca', 'semaforo', 'lavori', 'chiusur', 'incidente', 'nazionale', 'statale', 'provinciale', 'auto', 'camion', 'veloc', 'autostrada', 'tamponament', 'scontro', 'sinistro', 'coda', 'rallentament', 'rotonda', 'svincolo', 'deviazione', 'allagat'],
   },
   {
-    value: 'Parrocchia', label: 'Parrocchia', icon: '⛪', color: '#7a5a8a',
+    value: 'Parrocchia', label: 'Parrocchia', icon: '⛪', color: '#7c3aed', text: '#ffffff',
     kw: ['messa', 'parrocchia', 'chiesa', 'don ', 'catechism', 'oratorio', 'rosario', 'battesim', 'funeral'],
   },
   {
-    value: 'Calcio', label: 'Calcio', icon: '⚽', color: '#2e7d32',
+    value: 'Calcio', label: 'Calcio', icon: '⚽', color: '#2e7d32', text: '#ffffff',
     kw: ['calcio', 'partita', 'torneo', 'squadra', 'pallone', 'campionato', 'allenament', 'trofeo', 'gol', 'goal', 'mister', 'ganaceto calcio'],
   },
   {
-    value: 'Info', label: 'Richiesta info', icon: '❓', color: '#7a5a3a',
+    value: 'Info', label: 'Richiesta info', icon: '❓', color: '#6b7280', text: '#ffffff',
     kw: ['qualcuno sa', 'informazion', 'come si', 'sapete', 'vorrei sapere', 'chiedo', 'cercasi', 'cerco'],
   },
 ];

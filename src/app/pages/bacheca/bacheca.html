@@ -25,6 +25,7 @@
               [class.on]="manualTag() === t.value"
               [class.suggest]="manualTag() === null && autoTag() === t.value"
               [style.--chip]="t.color"
+              [style.--chip-text]="t.text"
               (click)="selectTag(t.value)">
               {{ t.icon }} {{ t.label }}
             </button>
@@ -71,7 +72,7 @@
   <div class="tagfilter" role="group" aria-label="Filtra per tipo">
     <button class="fchip" [class.on]="filter() === 'all'" (click)="setFilter('all')">Tutti</button>
     @for (t of tags; track t.value) {
-      <button class="fchip" [class.on]="filter() === t.value" [style.--chip]="t.color" (click)="setFilter(t.value)">
+      <button class="fchip" [class.on]="filter() === t.value" [style.--chip]="t.color" [style.--chip-text]="t.text" (click)="setFilter(t.value)">
         {{ t.icon }} {{ t.label }}
       </button>
     }
@@ -157,7 +158,7 @@
             <button class="linkbtn" type="button" (click)="rispondi(msg.id)">↩ Rispondi</button>
           }
           <span class="foot-meta">
-            <span class="mtag" [style.background]="tipo(msg.tag).color">{{ tipo(msg.tag).icon }} {{ tipo(msg.tag).label }}</span>
+            <span class="mtag" [style.background]="tipo(msg.tag).color" [style.color]="tipo(msg.tag).text">{{ tipo(msg.tag).icon }} {{ tipo(msg.tag).label }}</span>
             <time class="mtime" [attr.datetime]="msg.createdAt">{{ msg.createdAt | date: 'dd/MM HH:mm' }}</time>
           </span>
         </div>

@@ -52,7 +52,7 @@ textarea {
 
   &:hover { border-color: var(--chip); }
   &.suggest { border-color: var(--chip); border-style: dashed; color: var(--chip); }
-  &.on { background: var(--chip); border-color: var(--chip); color: #fff; }
+  &.on { background: var(--chip); border-color: var(--chip); color: var(--chip-text, #fff); }
 }
 .hint { font-size: 0.73rem; color: var(--muted); margin: 6px 2px 0; }
 
@@ -152,7 +152,7 @@ textarea {
   cursor: pointer;
   white-space: nowrap;
 
-  &.on { background: var(--chip); border-color: var(--chip); color: #fff; }
+  &.on { background: var(--chip); border-color: var(--chip); color: var(--chip-text, #fff); }
 }
 
 /* ── Messaggi ─────────────────────────────── */
