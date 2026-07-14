@@ -166,6 +166,17 @@ textarea {
   border-radius: 16px;
   padding: 14px;
   box-shadow: 0 6px 18px rgba(60, 44, 25, .06);
+  transition: box-shadow .3s ease, border-color .3s ease;
+
+  &.highlight {
+    border-color: var(--accent);
+    animation: cardHighlight 3.2s ease;
+  }
+}
+@keyframes cardHighlight {
+  0% { box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 6px rgba(94, 125, 79, .35); }
+  15% { box-shadow: 0 0 0 4px var(--accent-soft), 0 0 0 10px rgba(94, 125, 79, .28); }
+  100% { box-shadow: 0 6px 18px rgba(60, 44, 25, .06); }
 }
 
 /* pulsante flottante "scrivi" (stile app) */

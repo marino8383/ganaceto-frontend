@@ -86,7 +86,7 @@
 
   <ul class="messaggi-list" aria-label="Messaggi bacheca">
     @for (msg of filtered(); track msg.id) {
-      <li class="messaggio-card">
+      <li class="messaggio-card" [id]="'msg-' + msg.id" [class.highlight]="highlightId() === msg.id">
         <div class="mhead">
           <span class="avatar" aria-hidden="true">{{ msg.userDisplayName.charAt(0).toUpperCase() }}</span>
           <span class="autore">

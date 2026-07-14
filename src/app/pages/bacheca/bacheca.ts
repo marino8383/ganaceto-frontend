@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Auth } from '../../services/auth';
 import {
@@ -32,6 +34,7 @@ export class Bacheca implements OnInit {
   private readonly api = inject(BachecaService);
   private readonly fb = inject(FormBuilder);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly route = inject(ActivatedRoute);
   readonly auth = inject(Auth);
 
   readonly tags = BACHECA_TAGS;
@@ -70,9 +73,32 @@ export class Bacheca implements OnInit {
 
   private readonly mapCache = new Map<string, SafeResourceUrl>();
 
+  // deep-link da notifica: /bacheca?msg=ID → scorre al messaggio e lo evidenzia
+  private readonly pendingHighlight = signal<number | null>(null);
+  readonly highlightId = signal<number | null>(null);
+
+  private readonly highlightEffect = effect(() => {
+    const id = this.pendingHighlight();
+    if (id === null) return;
+    if (this.messaggi().some((m) => m.id === id)) {
+      this.pendingHighlight.set(null);
+      this.highlightId.set(id);
+      setTimeout(() => this.scrollToMsg(id), 80);
+      setTimeout(() => this.highlightId.set(null), 3200);
+    }
+  });
+
   ngOnInit(): void {
     this.load();
     this.postForm.controls.testo.valueChanges.subscribe((v) => this.testoValue.set(v ?? ''));
+    this.route.queryParamMap.subscribe((p) => {
+      const m = p.get('msg');
+      if (m) this.pendingHighlight.set(Number(m));
+    });
+  }
+
+  private scrollToMsg(id: number): void {
+    document.getElementById('msg-' + id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   private load(): void {
