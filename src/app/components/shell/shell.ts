@@ -45,8 +45,9 @@ export class Shell {
   // indicatore "online ora" verosimile (di notte ~0, di giorno oscilla 4-6, sera 5-7)
   readonly online = signal(4);
 
-  // splash d'apertura: solo la prima volta della sessione (niente splash ai refresh)
-  readonly splashVisible = signal(!sessionStorage.getItem('ganaceto_splash'));
+  // splash d'apertura: solo nel browser e una volta per sessione.
+  // Nell'app installata (standalone) NON lo mostriamo: c'è già quello del sistema.
+  readonly splashVisible = signal(!this.install.installed() && !sessionStorage.getItem('ganaceto_splash'));
 
   // fumetto "N utenti online ora!" al tocco del pallino
   readonly onlineTip = signal(false);
