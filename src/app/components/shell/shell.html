@@ -6,9 +6,13 @@
       <span class="logo"><img src="logo-icon.png" width="191" height="209" alt="Insieme per Ganaceto" /></span>
       <span class="htitle">Insieme per Ganaceto</span>
     </div>
-    <span class="online-pill" title="Persone online ora">
-      <span class="op-dot"></span>{{ online() }}<span class="op-lbl">&nbsp;online</span>
-    </span>
+    <button class="online-badge" [class.zero]="online() === 0" (click)="toggleOnlineTip()"
+      [attr.aria-label]="online() + ' utenti online ora'">
+      {{ online() }}
+      @if (onlineTip()) {
+        <span class="online-tip">{{ online() }} {{ online() === 1 ? 'utente online' : 'utenti online' }} ora!</span>
+      }
+    </button>
     @if (isLogged()) {
       <button class="bellbtn" (click)="openNotifiche()" aria-label="Notifiche" title="Notifiche">
         <span aria-hidden="true">🔔</span>

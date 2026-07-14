@@ -46,6 +46,10 @@ export class Shell {
   // splash d'apertura
   readonly splashVisible = signal(true);
 
+  // fumetto "N utenti online ora!" al tocco del pallino
+  readonly onlineTip = signal(false);
+  private tipTimer: ReturnType<typeof setTimeout> | undefined;
+
   constructor() {
     this.tickOnline();
     const onlineTimer = setInterval(() => this.tickOnline(), 16000);
@@ -64,7 +68,16 @@ export class Shell {
       clearInterval(onlineTimer);
       clearInterval(notifTimer);
       clearTimeout(splashTimer);
+      clearTimeout(this.tipTimer);
     });
+  }
+
+  toggleOnlineTip(): void {
+    this.onlineTip.update((v) => !v);
+    clearTimeout(this.tipTimer);
+    if (this.onlineTip()) {
+      this.tipTimer = setTimeout(() => this.onlineTip.set(false), 2600);
+    }
   }
 
   openProfilo(): void {
