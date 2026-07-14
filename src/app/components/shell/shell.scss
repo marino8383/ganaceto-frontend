@@ -1,4 +1,6 @@
-:host { display: block; height: 100dvh; overflow: hidden; }
+/* ancorata al viewport reale: evita che con 100dvh la barra in fondo finisca
+   fuori schermo ("a caso") nelle PWA installate */
+:host { position: fixed; inset: 0; display: block; overflow: hidden; }
 
 .app {
   display: flex;
