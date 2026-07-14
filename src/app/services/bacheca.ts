@@ -93,13 +93,24 @@ export class BachecaService {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE_URL);
 
-  // stato condiviso: persiste tra le navigazioni → al ritorno la lista è già pronta
-  private readonly _messaggi = signal<MessaggioBacheca[]>([]);
+  private static readonly CACHE_KEY = 'ganaceto_bacheca';
+
+  // stato condiviso: persiste tra le navigazioni; idratato da localStorage per il refresh
+  private readonly _messaggi = signal<MessaggioBacheca[]>(this.readCache());
   readonly messaggi = this._messaggi.asReadonly();
   readonly loading = signal(false);
-  private loadedOnce = false;
+  private loadedOnce = this._messaggi().length > 0;
 
-  // Carica i messaggi. Mostra il caricamento solo la prima volta (dopo è in background).
+  private readCache(): MessaggioBacheca[] {
+    try {
+      const raw = localStorage.getItem(BachecaService.CACHE_KEY);
+      return raw ? (JSON.parse(raw) as MessaggioBacheca[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  // Carica i messaggi. Mostra il caricamento solo se non c'è nulla in cache.
   load(): void {
     if (!this.loadedOnce) this.loading.set(true);
     this.http.get<MessaggioBacheca[]>(`${this.base}/api/bacheca`).subscribe({
@@ -107,6 +118,11 @@ export class BachecaService {
         this._messaggi.set(items);
         this.loadedOnce = true;
         this.loading.set(false);
+        try {
+          localStorage.setItem(BachecaService.CACHE_KEY, JSON.stringify(items));
+        } catch {
+          /* quota piena o storage non disponibile: ignora */
+        }
       },
       error: () => this.loading.set(false),
     });

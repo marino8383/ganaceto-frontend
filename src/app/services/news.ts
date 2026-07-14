@@ -82,13 +82,30 @@ export class News {
   private readonly http = inject(HttpClient);
   private readonly base = inject(API_BASE_URL);
 
-  private readonly _notizie = signal<NewsItem[]>([]);
+  private static readonly CACHE_KEY = 'ganaceto_news';
+
+  // idratato da localStorage: al refresh le notizie compaiono subito, poi si aggiornano
+  private readonly _notizie = signal<NewsItem[]>(this.readCache());
   readonly notizie = this._notizie.asReadonly();
 
+  private readCache(): NewsItem[] {
+    try {
+      const raw = localStorage.getItem(News.CACHE_KEY);
+      return raw ? (JSON.parse(raw) as NewsItem[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
   loadNotizie(): void {
-    this.http
-      .get<NewsItem[]>(`${this.base}/api/news`)
-      .subscribe((items) => this._notizie.set(items));
+    this.http.get<NewsItem[]>(`${this.base}/api/news`).subscribe((items) => {
+      this._notizie.set(items);
+      try {
+        localStorage.setItem(News.CACHE_KEY, JSON.stringify(items));
+      } catch {
+        /* storage pieno/non disponibile: ignora */
+      }
+    });
   }
 
   getById(id: number) {

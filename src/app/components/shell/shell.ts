@@ -43,8 +43,8 @@ export class Shell {
   // indicatore "online ora" verosimile (di notte ~0, di giorno oscilla 4-6, sera 5-7)
   readonly online = signal(4);
 
-  // splash d'apertura
-  readonly splashVisible = signal(true);
+  // splash d'apertura: solo la prima volta della sessione (niente splash ai refresh)
+  readonly splashVisible = signal(!sessionStorage.getItem('ganaceto_splash'));
 
   // fumetto "N utenti online ora!" al tocco del pallino
   readonly onlineTip = signal(false);
@@ -53,7 +53,11 @@ export class Shell {
   constructor() {
     this.tickOnline();
     const onlineTimer = setInterval(() => this.tickOnline(), 16000);
-    const splashTimer = setTimeout(() => this.splashVisible.set(false), 2200);
+    let splashTimer: ReturnType<typeof setTimeout> | undefined;
+    if (this.splashVisible()) {
+      sessionStorage.setItem('ganaceto_splash', '1');
+      splashTimer = setTimeout(() => this.splashVisible.set(false), 1400);
+    }
 
     // aggiorna il contatore notifiche al login e periodicamente
     effect(() => {
