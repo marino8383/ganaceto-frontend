@@ -5,6 +5,7 @@ import { ProfiloSheet } from '../profilo-sheet/profilo-sheet';
 import { NotificheSheet } from '../notifiche-sheet/notifiche-sheet';
 import { Auth } from '../../services/auth';
 import { Notifiche } from '../../services/notifiche';
+import { InstallService } from '../../services/install';
 
 interface Tab { path: string; label: string; icon: string; authOnly?: boolean; }
 
@@ -19,6 +20,7 @@ export class Shell {
   private readonly bottomSheet = inject(MatBottomSheet);
   private readonly auth = inject(Auth);
   private readonly notifiche = inject(Notifiche);
+  readonly install = inject(InstallService);
 
   // stato utente (reattivo)
   readonly user = this.auth.user;

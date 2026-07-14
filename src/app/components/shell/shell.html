@@ -38,6 +38,22 @@
     </button>
   </header>
 
+  <!-- Barra installa app (PWA) -->
+  @if (install.show) {
+    <div class="install-bar">
+      <span class="ib-icon material-icons" aria-hidden="true">add_to_home_screen</span>
+      @if (install.canInstall()) {
+        <span class="ib-text">Installa l'app sul telefono</span>
+        <button class="ib-btn" type="button" (click)="install.promptInstall()">Installa</button>
+      } @else {
+        <span class="ib-text">Per installare: tocca <b>Condividi</b> e poi <b>“Aggiungi alla Home”</b></span>
+      }
+      <button class="ib-x" type="button" (click)="install.dismiss()" aria-label="Chiudi">
+        <span class="material-icons" aria-hidden="true">close</span>
+      </button>
+    </div>
+  }
+
   <!-- Corpo: sidebar (desktop) + contenuto scrollabile -->
   <div class="body">
     <nav class="sidebar" aria-label="Navigazione">
