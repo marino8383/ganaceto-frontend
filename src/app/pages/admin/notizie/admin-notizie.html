@@ -133,7 +133,7 @@
             {{ item.isVisible ? '👁' : '🚫' }}
           </button>
           <button class="btn-icon" type="button" (click)="openEdit(item)" aria-label="Modifica">✏️</button>
-          <button class="btn-icon btn-danger" type="button" (click)="delete(item)" aria-label="Elimina">🗑</button>
+          <button class="btn-icon btn-danger" type="button" (click)="delete(item)" aria-label="Elimina"><span class="material-icons" aria-hidden="true">delete_outline</span></button>
         </div>
       </li>
     }

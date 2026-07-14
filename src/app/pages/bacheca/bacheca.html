@@ -103,7 +103,7 @@
               </button>
             }
             @if (canDelete(msg)) {
-              <button class="del" (click)="elimina(msg)" [title]="msg.isOwner ? 'Elimina' : 'Rimuovi (moderatore)'">🗑</button>
+              <button class="del" (click)="elimina(msg)" [title]="msg.isOwner ? 'Elimina' : 'Rimuovi (moderatore)'"><span class="material-icons" aria-hidden="true">delete_outline</span></button>
             }
           </span>
         </div>
@@ -140,7 +140,7 @@
                   <span class="autore">{{ r.userDisplayName }}@if (r.isOwner) { <span class="badge-tuo">tuo</span> }</span>
                   <time class="mtime" [attr.datetime]="r.createdAt">{{ r.createdAt | date: 'dd/MM HH:mm' }}</time>
                   @if (canDelete(r)) {
-                    <button class="del" (click)="eliminaRisposta(r.id)" title="Elimina">🗑</button>
+                    <button class="del" (click)="eliminaRisposta(r.id)" title="Elimina"><span class="material-icons" aria-hidden="true">delete_outline</span></button>
                   }
                 </div>
                 <p class="mtext">{{ r.testo }}</p>
