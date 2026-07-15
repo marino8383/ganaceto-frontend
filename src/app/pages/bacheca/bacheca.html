@@ -111,8 +111,14 @@
           </span>
         </div>
 
-        @if (msg.testo) {
-          <p class="mtext">{{ msg.testo }}</p>
+        @if (textWithoutUrl(msg.testo)) {
+          <p class="mtext">{{ textWithoutUrl(msg.testo) }}</p>
+        }
+
+        @if (firstUrl(msg.testo); as u) {
+          <a class="bacheca-lp" [href]="u" target="_blank" rel="noopener">
+            <app-link-preview [url]="u" [compact]="true" />
+          </a>
         }
 
         @if (msg.photoUrl) {

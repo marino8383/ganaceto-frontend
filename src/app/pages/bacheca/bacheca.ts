@@ -13,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Auth } from '../../services/auth';
 import { ShareDraftService } from '../../services/share-draft';
+import { LinkPreview } from '../../components/link-preview/link-preview';
 import {
   BachecaService,
   BachecaTag,
@@ -26,7 +27,7 @@ const MAX_PHOTO_BYTES = 2 * 1024 * 1024; // 2 MB
 
 @Component({
   selector: 'app-bacheca',
-  imports: [DatePipe, ReactiveFormsModule],
+  imports: [DatePipe, ReactiveFormsModule, LinkPreview],
   templateUrl: './bacheca.html',
   styleUrl: './bacheca.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -248,6 +249,18 @@ export class Bacheca implements OnInit {
           this.sending.set(false);
         },
       });
+  }
+
+  // Link condiviso nel testo del post → anteprima
+  private static readonly URL_RE = /https?:\/\/[^\s]+/i;
+
+  firstUrl(testo: string | null): string | null {
+    const m = testo?.match(Bacheca.URL_RE);
+    return m ? m[0] : null;
+  }
+
+  textWithoutUrl(testo: string | null): string {
+    return (testo ?? '').replace(Bacheca.URL_RE, '').trim();
   }
 
   canDelete(item: { isOwner: boolean }): boolean {

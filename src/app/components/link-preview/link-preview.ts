@@ -2,7 +2,16 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, si
 import { NgTemplateOutlet } from '@angular/common';
 import { News, LinkPreview as LinkPreviewData } from '../../services/news';
 
-type Channel = 'facebook' | 'instagram' | 'whatsapp' | 'youtube' | 'generic';
+type Channel =
+  | 'facebook'
+  | 'instagram'
+  | 'whatsapp'
+  | 'youtube'
+  | 'telegram'
+  | 'comune-modena'
+  | 'solierese'
+  | 'villanova'
+  | 'generic';
 
 @Component({
   selector: 'app-link-preview',
@@ -26,6 +35,10 @@ type Channel = 'facebook' | 'instagram' | 'whatsapp' | 'youtube' | 'generic';
             </svg>
           }
           @case ('youtube') { <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z" /></svg> }
+          @case ('telegram') { <span class="material-icons" aria-hidden="true">send</span> }
+          @case ('comune-modena') { <span class="material-icons" aria-hidden="true">account_balance</span> }
+          @case ('solierese') { <span class="material-icons" aria-hidden="true">sports_soccer</span> }
+          @case ('villanova') { <span class="material-icons" aria-hidden="true">sports_soccer</span> }
           @default { <span class="material-icons" aria-hidden="true">link</span> }
         }
       </div>
@@ -73,13 +86,17 @@ type Channel = 'facebook' | 'instagram' | 'whatsapp' | 'youtube' | 'generic';
 
     .chan-tile { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
     .chan-tile svg { width: 52%; height: 52%; }
+    .chan-tile .material-icons { font-size: 1.4em; }
     .ch-letter { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-size: 2.1em; line-height: 1; }
     .ch-facebook { background: #1877f2; color: #fff; }
     .ch-instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); color: #fff; }
     .ch-whatsapp { background: #25d366; color: #fff; }
     .ch-youtube { background: #ff0000; color: #fff; }
+    .ch-telegram { background: #229ed9; color: #fff; }
+    .ch-comune-modena { background: #34618e; color: #fff; }
+    .ch-solierese { background: #2e7d32; color: #fff; }
+    .ch-villanova { background: #1565c0; color: #fff; }
     .ch-generic { background: var(--surface-2); color: var(--muted); }
-    .ch-generic .material-icons { font-size: 26px; }
 
     .lp-thumb {
       width: 72px; height: 72px; border-radius: 12px; overflow: hidden;
@@ -130,6 +147,12 @@ export class LinkPreview implements OnInit {
 
   readonly channel = computed<Channel>(() => {
     const u = this.url().toLowerCase();
+    // Enti locali prima (spesso condivisi via Facebook/sito): riconosco dal nome
+    if (/comune\.modena\.it/.test(u)) return 'comune-modena';
+    if (/solierese/.test(u)) return 'solierese';
+    if (/villanova/.test(u)) return 'villanova';
+    // Piattaforme
+    if (/t\.me|telegram\./.test(u)) return 'telegram';
     if (/facebook\.|fb\.me|fb\.watch/.test(u)) return 'facebook';
     if (/instagram\./.test(u)) return 'instagram';
     if (/wa\.me|whatsapp\.|chat\.whatsapp/.test(u)) return 'whatsapp';
@@ -143,6 +166,10 @@ export class LinkPreview implements OnInit {
       case 'instagram': return 'Post su Instagram';
       case 'whatsapp': return 'Messaggio WhatsApp';
       case 'youtube': return 'Video su YouTube';
+      case 'telegram': return 'Messaggio Telegram';
+      case 'comune-modena': return 'Comune di Modena';
+      case 'solierese': return 'Solierese Calcio';
+      case 'villanova': return 'Polisportiva Villanova';
       default: return 'Apri il link';
     }
   });
