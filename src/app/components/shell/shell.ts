@@ -47,12 +47,12 @@ export class Shell {
   ];
   readonly tabs = computed(() => this.allTabs.filter((t) => !t.authOnly || this.isLogged()));
 
-  // Pallino "online ora" = utenti REALI (backend) + un riempimento "ambientale"
-  // per fascia oraria (oscilla, cala a 0 di notte). Serve a non sembrare deserto
-  // nei primi tempi; quando ci sono persone vere il numero sale davvero.
+  // Pallino "online ora" = max(utenti REALI, quota "ambientale"). La quota fa da
+  // pavimento vivace per fascia oraria (bassa di giorno, 0 di notte) così non
+  // sembra deserto nei primi tempi; quando i reali bastano, prevalgono loro.
   // NB: la dashboard admin /admin/accessi mostra sempre i numeri reali.
   private readonly ambient = signal(0);
-  readonly online = computed(() => this.auth.online() + this.ambient());
+  readonly online = computed(() => Math.max(this.auth.online(), this.ambient()));
 
   // fumetto "N utenti online ora!" al tocco del pallino
   readonly onlineTip = signal(false);
@@ -124,18 +124,19 @@ export class Shell {
     this.bottomSheet.open(NotificheSheet);
   }
 
-  // Target "vivace" per fascia oraria: ~5 di giorno, ~6 di sera, 0 di notte.
+  // Pavimento "vivace" per fascia oraria: ~2 di giorno, ~3 di sera, 0 di notte
+  // (ogni tanto +1 per farlo oscillare). Volutamente basso: paese piccolo, fase iniziale.
   private hourlyTarget(): number {
     const h = new Date().getHours();
-    const base = h < 7 || h >= 23 ? 0 : h < 19 ? 5 : 6;
-    return base === 0 ? 0 : Math.max(2, base + Math.round(Math.random() * 2 - 1));
+    if (h < 7 || h >= 23) return 0; // notte: nessuno
+    const base = h < 19 ? 2 : 3;
+    return base + (Math.random() < 0.4 ? 1 : 0);
   }
 
-  // Fa driftare il riempimento ambientale verso (target - utenti reali),
-  // così il totale mostrato oscilla attorno al target ma non scende mai sotto i reali.
+  // Fa driftare il pavimento ambientale verso il target orario (di ±1 alla volta).
   private tickAmbient(): void {
-    const desired = Math.max(0, this.hourlyTarget() - this.auth.online());
+    const target = this.hourlyTarget();
     const cur = this.ambient();
-    this.ambient.set(cur < desired ? cur + 1 : cur > desired ? cur - 1 : cur);
+    this.ambient.set(cur < target ? cur + 1 : cur > target ? cur - 1 : cur);
   }
 }
