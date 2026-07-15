@@ -22,10 +22,12 @@ export interface VisitStats {
 }
 
 export interface AccessOverview {
-  onlineCount: number;
+  onlineRegistered: number;
+  onlineGuests: number;
   online: OnlineUser[];
   log: AccessLogRow[];
-  logins: VisitStats;
+  loginsRegistered: VisitStats;
+  visitsGuests: VisitStats;
   registered: number;
 }
 

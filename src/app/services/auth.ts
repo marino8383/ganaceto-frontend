@@ -18,6 +18,8 @@ export class Auth {
   private readonly base = inject(API_BASE_URL);
 
   private readonly TOKEN_KEY = 'ganaceto_token';
+  private readonly ANON_KEY = 'ganaceto_anon';
+  private readonly VISIT_KEY = 'ganaceto_guest_visit';
 
   private readonly _user = signal<AuthResult | null>(this.loadFromStorage());
   readonly user = this._user.asReadonly();
@@ -58,12 +60,34 @@ export class Auth {
   }
 
   // "Battito" di presenza: aggiorna LastSeen (se loggato) e legge gli online.
-  // Da loggati usa /heartbeat (POST), da ospiti /online-count (GET, pubblico).
+  // Da loggati usa /heartbeat; da ospiti /presence/guest con id anonimo di dispositivo.
   refreshOnline(): void {
     const req = this.isLoggedIn
       ? this.http.post<{ online: number }>(`${this.base}/api/auth/heartbeat`, {})
-      : this.http.get<{ online: number }>(`${this.base}/api/auth/online-count`);
+      : this.http.post<{ online: number }>(`${this.base}/api/presence/guest`, { anonId: this.anonId() });
     req.subscribe({ next: (r) => this.online.set(r.online), error: () => {} });
+  }
+
+  // Registra una visita ospite al massimo una volta al giorno per dispositivo
+  // (dedup lato client: il server non salva alcun identificatore).
+  trackGuestVisitOnce(): void {
+    if (this.isLoggedIn) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(this.VISIT_KEY) === today) return;
+    this.http.post(`${this.base}/api/presence/visit`, {}).subscribe({
+      next: () => localStorage.setItem(this.VISIT_KEY, today),
+      error: () => {},
+    });
+  }
+
+  // Id anonimo di dispositivo per la presenza ospiti (solo localStorage, nessun dato personale).
+  private anonId(): string {
+    let id = localStorage.getItem(this.ANON_KEY);
+    if (!id) {
+      id = crypto?.randomUUID?.() ?? `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+      localStorage.setItem(this.ANON_KEY, id);
+    }
+    return id;
   }
 
   private loadFromStorage(): AuthResult | null {

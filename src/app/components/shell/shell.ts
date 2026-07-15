@@ -60,6 +60,7 @@ export class Shell {
 
   constructor() {
     this.auth.refreshOnline();
+    this.auth.trackGuestVisitOnce();
     const presenceTimer = setInterval(() => this.auth.refreshOnline(), 30000);
 
     // riempimento ambientale: salto iniziale al target orario, poi oscilla

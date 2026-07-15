@@ -14,10 +14,13 @@
   } @else if (data(); as d) {
 
     <!-- Online ora -->
-    <div class="sec-h">🟢 Online ora <span class="pill accent">{{ d.onlineCount }}</span></div>
-    @if (d.online.length === 0) {
-      <p class="muted">Nessun utente online adesso.</p>
-    } @else {
+    <div class="sec-h">🟢 Online ora <span class="pill accent">{{ d.onlineRegistered + d.onlineGuests }}</span></div>
+    <div class="stat3">
+      <div class="box"><div class="n">{{ d.onlineRegistered }}</div><div class="k">Registrati</div></div>
+      <div class="box"><div class="n">{{ d.onlineGuests }}</div><div class="k">Ospiti</div></div>
+      <div class="box"><div class="n">{{ d.onlineRegistered + d.onlineGuests }}</div><div class="k">Totale</div></div>
+    </div>
+    @if (d.online.length > 0) {
       <ul class="rows">
         @for (u of d.online; track u.name + u.lastSeenAt) {
           <li class="row">
@@ -30,16 +33,24 @@
       </ul>
     }
 
-    <!-- Accessi (login) per periodo -->
-    <div class="sec-h">Accessi</div>
+    <!-- Accessi registrati (login) -->
+    <div class="sec-h">Accessi registrati</div>
     <div class="stat3">
-      <div class="box"><div class="n">{{ d.logins.today }}</div><div class="k">Oggi</div></div>
-      <div class="box"><div class="n">{{ d.logins.week }}</div><div class="k">7 giorni</div></div>
-      <div class="box"><div class="n">{{ d.logins.month }}</div><div class="k">30 giorni</div></div>
+      <div class="box"><div class="n">{{ d.loginsRegistered.today }}</div><div class="k">Oggi</div></div>
+      <div class="box"><div class="n">{{ d.loginsRegistered.week }}</div><div class="k">7 giorni</div></div>
+      <div class="box"><div class="n">{{ d.loginsRegistered.month }}</div><div class="k">30 giorni</div></div>
     </div>
-    <p class="muted small">{{ d.registered }} utenti registrati in totale · un accesso è contato una volta al giorno per utente.</p>
 
-    <!-- Log accessi -->
+    <!-- Visite ospiti -->
+    <div class="sec-h">Visite ospiti</div>
+    <div class="stat3">
+      <div class="box"><div class="n">{{ d.visitsGuests.today }}</div><div class="k">Oggi</div></div>
+      <div class="box"><div class="n">{{ d.visitsGuests.week }}</div><div class="k">7 giorni</div></div>
+      <div class="box"><div class="n">{{ d.visitsGuests.month }}</div><div class="k">30 giorni</div></div>
+    </div>
+    <p class="muted small">{{ d.registered }} utenti registrati in totale · un accesso registrato è contato una volta al giorno per utente; le visite ospiti una volta al giorno per dispositivo.</p>
+
+    <!-- Log accessi (solo registrati) -->
     <div class="sec-h">Log accessi (login / logout)</div>
     @if (d.log.length === 0) {
       <p class="muted">Nessun accesso registrato.</p>
