@@ -28,6 +28,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/chi-siamo/chi-siamo').then((m) => m.ChiSiamo),
   },
   {
+    path: 'condividi',
+    loadComponent: () => import('./pages/condividi/condividi').then((m) => m.Condividi),
+  },
+  {
     path: 'admin/notizie',
     loadComponent: () => import('./pages/admin/notizie/admin-notizie').then((m) => m.AdminNotizie),
     canActivate: [adminGuard],

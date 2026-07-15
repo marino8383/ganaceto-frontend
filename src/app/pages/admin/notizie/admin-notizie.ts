@@ -10,6 +10,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CoverSize, News, NewsItem, NewsTag, NEWS_TYPES, newsType } from '../../../services/news';
+import { ShareDraftService } from '../../../services/share-draft';
 import { htmlToPlain } from '../../../shared/format';
 
 type FormMode = 'closed' | 'create' | 'edit';
@@ -27,6 +28,7 @@ const MAX_COVER_BYTES = 2 * 1024 * 1024; // 2 MB
 export class AdminNotizie implements OnInit {
   private readonly newsService = inject(News);
   private readonly fb = inject(FormBuilder);
+  private readonly shareDraft = inject(ShareDraftService);
 
   readonly notizie = this.newsService.adminNotizie;
   readonly formMode = signal<FormMode>('closed');
@@ -73,6 +75,17 @@ export class AdminNotizie implements OnInit {
 
   ngOnInit(): void {
     this.newsService.loadAdminNotizie();
+
+    // Arrivo da "Condividi qui": apro la creazione già precompilata.
+    const d = this.shareDraft.consume();
+    if (d) {
+      this.openCreate();
+      this.form.patchValue({
+        title: d.title || d.text.slice(0, 80) || 'Dal web',
+        body: d.text || d.title || '',
+        externalUrl: d.url || '',
+      });
+    }
   }
 
   openCreate(): void {

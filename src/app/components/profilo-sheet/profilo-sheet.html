@@ -26,6 +26,10 @@
       </button>
     }
 
+    <a class="admin-link" routerLink="/condividi" (click)="close()">
+      <span class="material-icons" aria-hidden="true">ios_share</span> Condividi un link qui
+    </a>
+
     @if (auth.isAdmin) {
       <a class="admin-link" routerLink="/admin/notizie" (click)="close()">
         <span class="material-icons" aria-hidden="true">edit</span> Gestisci notizie

@@ -1,0 +1,43 @@
+<div class="page">
+  <h1 class="ptitle">Condividi qui</h1>
+  <p class="sub">Hai un link (Instagram, news, Facebook…)? Portalo dentro l'app.</p>
+
+  <form [formGroup]="form" class="form">
+    <label class="field">
+      <span class="lbl">Link</span>
+      <input type="url" formControlName="url" inputmode="url" placeholder="https://…" />
+    </label>
+    <label class="field">
+      <span class="lbl">Titolo (facoltativo)</span>
+      <input type="text" formControlName="title" placeholder="Un titolo breve" />
+    </label>
+    <label class="field">
+      <span class="lbl">Testo (facoltativo)</span>
+      <textarea formControlName="text" rows="4" placeholder="Aggiungi due parole…"></textarea>
+    </label>
+  </form>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (!auth.isLoggedIn) {
+    <p class="hint">Per condividere devi prima accedere.</p>
+    <button class="btn primary" type="button" (click)="accedi()">Accedi</button>
+  } @else {
+    <div class="actions">
+      @if (auth.isAdmin) {
+        <button class="btn primary" type="button" (click)="creaNotizia()">
+          <span class="material-icons" aria-hidden="true">campaign</span> Crea notizia
+        </button>
+        <button class="btn ghost" type="button" (click)="pubblicaBacheca()">
+          <span class="material-icons" aria-hidden="true">forum</span> Pubblica in bacheca
+        </button>
+      } @else {
+        <button class="btn primary" type="button" (click)="pubblicaBacheca()">
+          <span class="material-icons" aria-hidden="true">forum</span> Pubblica in bacheca
+        </button>
+      }
+    </div>
+  }
+</div>

@@ -12,6 +12,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Auth } from '../../services/auth';
+import { ShareDraftService } from '../../services/share-draft';
 import {
   BachecaService,
   BachecaTag,
@@ -35,6 +36,7 @@ export class Bacheca implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly route = inject(ActivatedRoute);
+  private readonly shareDraft = inject(ShareDraftService);
   readonly auth = inject(Auth);
 
   readonly tags = BACHECA_TAGS;
@@ -95,6 +97,19 @@ export class Bacheca implements OnInit {
       const m = p.get('msg');
       if (m) this.pendingHighlight.set(Number(m));
     });
+
+    // Arrivo da "Condividi qui": apro il compositore già precompilato.
+    const d = this.shareDraft.consume();
+    if (d) {
+      const parts = [d.title, d.text, d.url].map((s) => s.trim()).filter(Boolean);
+      // evito di ripetere il link se è già dentro il testo
+      const testo = parts
+        .filter((p, i) => !(i === parts.length - 1 && p === d.url && d.text.includes(d.url)))
+        .join('\n\n');
+      this.postForm.controls.testo.setValue(testo);
+      this.testoValue.set(testo);
+      this.composing.set(true);
+    }
   }
 
   private scrollToMsg(id: number): void {
