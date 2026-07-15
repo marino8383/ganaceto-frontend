@@ -76,17 +76,29 @@ export class Shell {
       if (this.isLogged()) this.notifiche.refreshCount();
     }, 30000);
 
-    // controllo aggiornamenti PWA: segnala quando una nuova versione è pronta
+    // controllo aggiornamenti PWA: quando una nuova versione è pronta, la attivo
+    // subito e mostro la barra "Aggiorna"; verrà applicata al prossimo ritorno
+    // in primo piano (ricarica), così non si resta bloccati su versioni vecchie.
+    let pendingReload = false;
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates.subscribe((ev) => {
-        if (ev.type === 'VERSION_READY') this.updateReady.set(true);
+        if (ev.type === 'VERSION_READY') {
+          this.updateReady.set(true);
+          this.swUpdate.activateUpdate().then(() => { pendingReload = true; }).catch(() => {});
+        }
       });
       this.swUpdate.checkForUpdate().catch(() => {});
     }
 
-    // reattività: ricontrolla notifiche e aggiornamenti quando l'app torna in primo piano
+    // reattività: al ritorno in primo piano ricontrolla e, se c'è un aggiornamento
+    // pronto, ricarica per applicarlo.
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return;
+      if (pendingReload) {
+        pendingReload = false;
+        document.location.reload();
+        return;
+      }
       this.auth.refreshOnline();
       if (this.isLogged()) this.notifiche.refreshCount();
       if (this.swUpdate.isEnabled) this.swUpdate.checkForUpdate().catch(() => {});
