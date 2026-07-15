@@ -1,5 +1,60 @@
 <div class="chi-siamo">
-  <p class="placeholder">Pagina in preparazione. 🌿</p>
+  <h1 class="ptitle">Chi siamo</h1>
+
+  <section class="card">
+    <h2 class="assoc">Associazione Insieme per Ganaceto</h2>
+
+    <a class="info-row" [href]="mapsUrl" target="_blank" rel="noopener">
+      <span class="material-icons" aria-hidden="true">place</span>
+      <span>{{ address }}</span>
+    </a>
+
+    <a class="map-link" [href]="mapsUrl" target="_blank" rel="noopener" aria-label="Apri la mappa in Google Maps">
+      <iframe title="Mappa dell'associazione" [src]="mapEmbed" loading="lazy"></iframe>
+      <span class="map-cta"><span class="material-icons" aria-hidden="true">open_in_new</span> Apri in Maps</span>
+    </a>
+
+    <div class="contacts">
+      <a class="cbtn call" [href]="telHref">
+        <span class="material-icons" aria-hidden="true">call</span> {{ phoneDisplay }}
+      </a>
+      <a class="cbtn wa" [href]="waHref" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-h">Collegamenti</h2>
+    <a class="link-row" href="https://www.facebook.com/associazioneganaceto" target="_blank" rel="noopener">
+      <span class="brand fb" aria-hidden="true">f</span>
+      <span class="lbl">Insieme per Ganaceto <small>su Facebook</small></span>
+      <span class="material-icons chev" aria-hidden="true">open_in_new</span>
+    </a>
+  </section>
+
+  <section>
+    <h2 class="sec-h">Amici dell'associazione</h2>
+
+    <a class="link-row" href="https://www.facebook.com/ganacetofc?locale=it_IT" target="_blank" rel="noopener">
+      <span class="brand fb" aria-hidden="true">f</span>
+      <span class="lbl">Ganaceto Calcio <small>su Facebook</small></span>
+      <span class="material-icons chev" aria-hidden="true">open_in_new</span>
+    </a>
+
+    <a class="link-row" href="https://www.instagram.com/ganacitylife" target="_blank" rel="noopener">
+      <span class="brand ig" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="currentColor" stroke-width="2" />
+          <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2" />
+          <circle cx="17.6" cy="6.4" r="1.4" fill="currentColor" />
+        </svg>
+      </span>
+      <span class="lbl">GanaCity <small>su Instagram</small></span>
+      <span class="material-icons chev" aria-hidden="true">open_in_new</span>
+    </a>
+  </section>
 
   <footer class="build">
     versione <code>{{ build.commit }}</code> · aggiornata il {{ build.time | date: 'dd/MM/yyyy HH:mm' }}
