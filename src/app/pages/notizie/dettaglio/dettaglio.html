@@ -27,9 +27,7 @@
     <div class="dettaglio-body" [innerHTML]="safeBody()" aria-label="Contenuto notizia"></div>
 
     @if (n.externalUrl) {
-      <a class="ext-link" [href]="n.externalUrl" target="_blank" rel="noopener">
-        <span class="material-icons" aria-hidden="true">open_in_new</span> {{ channelLabel(n.externalUrl) }}
-      </a>
+      <app-link-preview [url]="n.externalUrl" />
     }
 
     <div class="dettaglio-actions">

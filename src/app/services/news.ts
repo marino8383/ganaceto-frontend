@@ -1,5 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, of, tap } from 'rxjs';
 import { API_BASE_URL } from '../app.config';
 
 export type NewsTag = 'Avviso' | 'Evento' | 'Info' | 'Comune' | 'ControlloVicinato';
@@ -72,6 +73,14 @@ export interface UpdateNewsDto {
   externalUrl: string | null;
 }
 
+export interface LinkPreview {
+  url: string;
+  title: string | null;
+  description: string | null;
+  image: string | null;
+  siteName: string | null;
+}
+
 /** Etichetta del bottone in base al canale del link esterno. */
 export function externalChannelLabel(url: string): string {
   const u = (url || '').toLowerCase();
@@ -107,6 +116,17 @@ export class News {
     } catch {
       return [];
     }
+  }
+
+  // cache in sessione delle anteprime link (il backend ha già la sua)
+  private readonly previewCache = new Map<string, LinkPreview>();
+
+  getLinkPreview(url: string): Observable<LinkPreview> {
+    const cached = this.previewCache.get(url);
+    if (cached) return of(cached);
+    return this.http
+      .get<LinkPreview>(`${this.base}/api/link-preview`, { params: { url } })
+      .pipe(tap((p) => this.previewCache.set(url, p)));
   }
 
   loadNotizie(): void {

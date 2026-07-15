@@ -11,10 +11,11 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { News, NewsItem, newsType, newsTimeRange, externalChannelLabel } from '../../../services/news';
 import { renderNewsBody } from '../../../shared/format';
+import { LinkPreview } from '../../../components/link-preview/link-preview';
 
 @Component({
   selector: 'app-notizia-dettaglio',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, LinkPreview],
   templateUrl: './dettaglio.html',
   styleUrl: './dettaglio.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -39,6 +39,12 @@
             <h2 class="notizia-titolo">{{ n.title }}</h2>
           </a>
 
+          @if (!n.coverImageUrl && n.externalUrl) {
+            <a class="lp-list" [routerLink]="['/notizie', n.id]" [attr.aria-label]="'Apri: ' + n.title">
+              <app-link-preview [url]="n.externalUrl" [compact]="true" />
+            </a>
+          }
+
           @if (n.expandedInHome) {
             <div class="notizia-contenuto" [innerHTML]="safe(n.body)"></div>
           }

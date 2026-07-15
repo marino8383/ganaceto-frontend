@@ -4,10 +4,11 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { News, newsType, newsTimeRange } from '../../services/news';
 import { renderNewsBody } from '../../shared/format';
+import { LinkPreview } from '../../components/link-preview/link-preview';
 
 @Component({
   selector: 'app-notizie',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, LinkPreview],
   templateUrl: './notizie.html',
   styleUrl: './notizie.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

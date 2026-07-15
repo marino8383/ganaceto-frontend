@@ -50,6 +50,9 @@ h1, h2, h3, .font-serif { font-family: 'Fraunces', serif; }
 }
 .content-link { color: var(--primary); word-break: break-word; }
 
+// Anteprima link compatta in lista (apre la notizia interna)
+.lp-list { display: block; text-decoration: none; margin: 10px 0 4px; }
+
 // Contatti incolonnati: nome | 📞 numero | 💬 WhatsApp allineati
 .contact-grid {
   display: grid;
