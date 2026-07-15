@@ -1,0 +1,26 @@
+.chi-siamo {
+  font-family: 'DM Sans', sans-serif;
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px 28px;
+  color: var(--text);
+}
+
+.placeholder {
+  color: var(--muted);
+  flex: 1;
+}
+
+.build {
+  margin-top: auto;
+  padding-top: 18px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--muted);
+  opacity: 0.75;
+}
+.build code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}

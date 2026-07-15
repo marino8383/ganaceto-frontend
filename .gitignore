@@ -42,3 +42,6 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Build info generato a build-time (vedi scripts/gen-build-info.cjs)
+/src/app/build-info.ts
