@@ -47,8 +47,12 @@ export class Shell {
   ];
   readonly tabs = computed(() => this.allTabs.filter((t) => !t.authOnly || this.isLogged()));
 
-  // utenti online ora (reale, dal backend via heartbeat/online-count)
-  readonly online = this.auth.online;
+  // Pallino "online ora" = utenti REALI (backend) + un riempimento "ambientale"
+  // per fascia oraria (oscilla, cala a 0 di notte). Serve a non sembrare deserto
+  // nei primi tempi; quando ci sono persone vere il numero sale davvero.
+  // NB: la dashboard admin /admin/accessi mostra sempre i numeri reali.
+  private readonly ambient = signal(0);
+  readonly online = computed(() => this.auth.online() + this.ambient());
 
   // fumetto "N utenti online ora!" al tocco del pallino
   readonly onlineTip = signal(false);
@@ -57,6 +61,10 @@ export class Shell {
   constructor() {
     this.auth.refreshOnline();
     const presenceTimer = setInterval(() => this.auth.refreshOnline(), 30000);
+
+    // riempimento ambientale: salto iniziale al target orario, poi oscilla
+    this.ambient.set(this.hourlyTarget());
+    const ambientTimer = setInterval(() => this.tickAmbient(), 16000);
 
     // aggiorna il contatore notifiche al login e periodicamente
     effect(() => {
@@ -87,6 +95,7 @@ export class Shell {
 
     inject(DestroyRef).onDestroy(() => {
       clearInterval(presenceTimer);
+      clearInterval(ambientTimer);
       clearInterval(notifTimer);
       clearTimeout(this.tipTimer);
       document.removeEventListener('visibilitychange', onVisible);
@@ -112,5 +121,20 @@ export class Shell {
 
   openNotifiche(): void {
     this.bottomSheet.open(NotificheSheet);
+  }
+
+  // Target "vivace" per fascia oraria: ~5 di giorno, ~6 di sera, 0 di notte.
+  private hourlyTarget(): number {
+    const h = new Date().getHours();
+    const base = h < 7 || h >= 23 ? 0 : h < 19 ? 5 : 6;
+    return base === 0 ? 0 : Math.max(2, base + Math.round(Math.random() * 2 - 1));
+  }
+
+  // Fa driftare il riempimento ambientale verso (target - utenti reali),
+  // così il totale mostrato oscilla attorno al target ma non scende mai sotto i reali.
+  private tickAmbient(): void {
+    const desired = Math.max(0, this.hourlyTarget() - this.auth.online());
+    const cur = this.ambient();
+    this.ambient.set(cur < desired ? cur + 1 : cur > desired ? cur - 1 : cur);
   }
 }
