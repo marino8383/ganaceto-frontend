@@ -5,7 +5,7 @@ import { API_BASE_URL } from '../app.config';
 
 export type NewsTag = 'Avviso' | 'Evento' | 'Info' | 'Comune' | 'ControlloVicinato';
 
-export type CoverSize = 'small' | 'medium' | 'large';
+export type CoverSize = 'small' | 'medium' | 'large' | 'side';
 
 export interface NewsType {
   value: NewsTag;

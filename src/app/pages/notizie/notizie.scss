@@ -56,6 +56,13 @@
 
 .notizia-body { padding: 13px 15px 15px; }
 
+/* copertina "a lato": immaginetta piccola accanto al testo (notizie condivise/link) */
+.cover-side-link { float: left; margin: 2px 12px 6px 0; display: block; }
+.cover-side {
+  width: 86px; height: 86px; object-fit: cover;
+  border-radius: 12px; display: block; background: var(--surface-2);
+}
+
 .notizia-tag {
   display: inline-flex;
   align-items: center;
@@ -97,6 +104,7 @@
   align-items: center;
   gap: 10px;
   margin-top: 10px;
+  clear: both;
 }
 .leggi {
   font-size: 0.85rem;

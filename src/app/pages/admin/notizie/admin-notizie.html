@@ -80,11 +80,13 @@
 
           @if (cover()) {
             <div class="cover-size">
-              <span class="cover-size-lbl">Dimensione copertina:</span>
+              <span class="cover-size-lbl">Come mostrare l'immagine:</span>
+              <button type="button" [class.on]="form.controls.coverSize.value === 'side'" (click)="form.controls.coverSize.setValue('side')">🖼️ Miniatura a lato</button>
               <button type="button" [class.on]="form.controls.coverSize.value === 'small'" (click)="form.controls.coverSize.setValue('small')">Piccola</button>
               <button type="button" [class.on]="form.controls.coverSize.value === 'medium'" (click)="form.controls.coverSize.setValue('medium')">Media</button>
               <button type="button" [class.on]="form.controls.coverSize.value === 'large'" (click)="form.controls.coverSize.setValue('large')">Grande</button>
             </div>
+            <span class="field-hint">"Miniatura a lato" = come le notizie condivise (immaginetta piccola accanto al testo).</span>
           }
         </div>
 

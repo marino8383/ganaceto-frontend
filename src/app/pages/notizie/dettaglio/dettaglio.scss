@@ -27,6 +27,7 @@
   &[data-size="small"] { max-height: 220px; }
   &[data-size="medium"] { max-height: 380px; }
   &[data-size="large"] { max-height: 80vh; }
+  &[data-size="side"] { width: auto; max-width: 220px; max-height: 220px; }
 }
 
 .dettaglio-header {

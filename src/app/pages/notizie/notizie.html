@@ -11,7 +11,7 @@
           [class.expanded]="n.expandedInHome"
           [style.--type]="tipo(n.tag).color">
 
-        @if (n.coverImageUrl) {
+        @if (n.coverImageUrl && n.coverSize !== 'side') {
           @if (n.expandedInHome) {
             <div class="cover zoomable" [attr.data-size]="n.coverSize || 'medium'" (click)="zoom.set(n.coverImageUrl)">
               <img [src]="n.coverImageUrl" [alt]="n.title" />
@@ -27,7 +27,12 @@
         }
 
         <div class="notizia-body">
-          @if (!n.coverImageUrl) {
+          @if (n.coverImageUrl && n.coverSize === 'side') {
+            <a class="cover-side-link" [routerLink]="['/notizie', n.id]" [attr.aria-label]="'Apri: ' + n.title">
+              <img class="cover-side" [src]="n.coverImageUrl" [alt]="n.title" />
+            </a>
+          }
+          @if (!n.coverImageUrl || n.coverSize === 'side') {
             <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
           }
 
