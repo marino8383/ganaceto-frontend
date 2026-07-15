@@ -105,20 +105,33 @@
                 <span class="material-icons" aria-hidden="true">{{ msg.isFollowing ? 'notifications_active' : 'notifications_none' }}</span>
               </button>
             }
+            @if (canEdit(msg) && editingId() !== msg.id) {
+              <button class="edit-btn" (click)="startEdit(msg)" title="Modifica"><span class="material-icons" aria-hidden="true">edit</span></button>
+            }
             @if (canDelete(msg)) {
               <button class="del" (click)="elimina(msg)" [title]="msg.isOwner ? 'Elimina' : 'Rimuovi (moderatore)'"><span class="material-icons" aria-hidden="true">delete_outline</span></button>
             }
           </span>
         </div>
 
-        @if (textWithoutUrl(msg.testo)) {
-          <p class="mtext">{{ textWithoutUrl(msg.testo) }}</p>
-        }
+        @if (editingId() === msg.id) {
+          <form class="edit-form" (ngSubmit)="salvaModifica(msg)">
+            <textarea [formControl]="editControl" rows="3" maxlength="500" placeholder="Modifica il messaggio…"></textarea>
+            <div class="edit-actions">
+              <button type="button" class="linkbtn" (click)="annullaModifica()">Annulla</button>
+              <button type="submit" class="btn-salva" [disabled]="sending()">Salva</button>
+            </div>
+          </form>
+        } @else {
+          @if (textWithoutUrl(msg.testo)) {
+            <p class="mtext">{{ textWithoutUrl(msg.testo) }}</p>
+          }
 
-        @if (firstUrl(msg.testo); as u) {
-          <a class="bacheca-lp" [href]="u" target="_blank" rel="noopener">
-            <app-link-preview [url]="u" [compact]="true" />
-          </a>
+          @if (firstUrl(msg.testo); as u) {
+            <a class="bacheca-lp" [href]="u" target="_blank" rel="noopener">
+              <app-link-preview [url]="u" [compact]="true" />
+            </a>
+          }
         }
 
         @if (msg.photoUrl) {

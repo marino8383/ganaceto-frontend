@@ -149,6 +149,10 @@ export class BachecaService {
     return this.http.post<MessaggioBacheca>(`${this.base}/api/bacheca`, dto);
   }
 
+  update(id: number, testo: string, tag: BachecaTag) {
+    return this.http.put<void>(`${this.base}/api/bacheca/${id}`, { testo, tag });
+  }
+
   delete(id: number) {
     return this.http.delete<void>(`${this.base}/api/bacheca/${id}`);
   }

@@ -70,6 +70,10 @@ export class Bacheca implements OnInit {
     testo: ['', [Validators.required, Validators.maxLength(500)]],
   });
 
+  // --- modifica di un proprio messaggio (solo senza risposte) ---
+  readonly editingId = signal<number | null>(null);
+  readonly editControl = this.fb.nonNullable.control('', Validators.maxLength(500));
+
   readonly composing = signal(false);
   readonly sending = signal(false);
   readonly error = signal<string | null>(null);
@@ -282,6 +286,43 @@ export class Bacheca implements OnInit {
   eliminaRisposta(id: number): void {
     if (!confirm('Eliminare la risposta?')) return;
     this.api.delete(id).subscribe({ next: () => this.load() });
+  }
+
+  // --- modifica messaggio (solo autore, solo se senza risposte) ---
+  canEdit(msg: MessaggioBacheca): boolean {
+    return msg.isOwner && msg.risposte.length === 0;
+  }
+
+  startEdit(msg: MessaggioBacheca): void {
+    this.editingId.set(msg.id);
+    this.editControl.setValue(msg.testo ?? '');
+    this.error.set(null);
+  }
+
+  annullaModifica(): void {
+    this.editingId.set(null);
+  }
+
+  salvaModifica(msg: MessaggioBacheca): void {
+    const testo = this.editControl.getRawValue().trim();
+    if (!testo && !msg.photoUrl) {
+      this.error.set('Scrivi un messaggio o lascia la foto.');
+      return;
+    }
+    if (this.sending()) return;
+    this.sending.set(true);
+    this.error.set(null);
+    this.api.update(msg.id, testo, msg.tag).subscribe({
+      next: () => {
+        this.editingId.set(null);
+        this.sending.set(false);
+        this.load();
+      },
+      error: () => {
+        this.error.set('Errore durante la modifica.');
+        this.sending.set(false);
+      },
+    });
   }
 
   // --- follow (campanella) ---
