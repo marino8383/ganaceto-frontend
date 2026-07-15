@@ -7,8 +7,8 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
   template: `
     @if (compact()) {
       <div class="lp compact">
-        @if (data()?.image) {
-          <img class="lp-thumb" [src]="data()!.image" alt="" referrerpolicy="no-referrer" />
+        @if (showImage()) {
+          <img class="lp-thumb" [src]="data()!.image" alt="" referrerpolicy="no-referrer" (error)="imgError.set(true)" />
         } @else {
           <div class="lp-thumb lp-ph"><span class="material-icons" aria-hidden="true">link</span></div>
         }
@@ -18,9 +18,9 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
         </div>
       </div>
     } @else {
-      <button type="button" class="lp full" (click)="open()">
-        @if (data()?.image) {
-          <img class="lp-cover" [src]="data()!.image" alt="" referrerpolicy="no-referrer" />
+      <a class="lp full" [href]="url()" target="_blank" rel="noopener">
+        @if (showImage()) {
+          <img class="lp-cover" [src]="data()!.image" alt="" referrerpolicy="no-referrer" (error)="imgError.set(true)" />
         }
         <div class="lp-body">
           <span class="lp-domain"><span class="material-icons" aria-hidden="true">public</span> {{ domain() }}</span>
@@ -28,7 +28,7 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
           @if (data()?.description) { <span class="lp-desc">{{ data()!.description }}</span> }
           <span class="lp-open"><span class="material-icons" aria-hidden="true">open_in_new</span> Apri l'originale</span>
         </div>
-      </button>
+      </a>
     }
   `,
   styles: [
@@ -52,10 +52,9 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
     }
 
     .lp.full {
-      display: block; width: 100%; text-align: left; cursor: pointer;
+      display: block; width: 100%; text-align: left; text-decoration: none; color: inherit;
       border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
-      background: var(--surface, #fffdf9); padding: 0; font: inherit;
-      margin-top: 18px;
+      background: var(--surface, #fffdf9); margin-top: 18px;
     }
     .lp.full:hover { border-color: var(--primary); }
     .lp-cover { width: 100%; max-height: 300px; object-fit: cover; display: block; background: var(--surface-2); }
@@ -81,6 +80,10 @@ export class LinkPreview implements OnInit {
 
   readonly data = signal<LinkPreviewData | null>(null);
   readonly loading = signal(true);
+  readonly imgError = signal(false);
+
+  // Mostro l'immagine solo se c'è ed è caricabile (Facebook & co. spesso la bloccano).
+  readonly showImage = computed(() => !!this.data()?.image && !this.imgError());
 
   readonly domain = computed(() => {
     try {
@@ -98,9 +101,5 @@ export class LinkPreview implements OnInit {
       },
       error: () => this.loading.set(false),
     });
-  }
-
-  open(): void {
-    window.open(this.url(), '_blank', 'noopener');
   }
 }
