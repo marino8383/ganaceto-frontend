@@ -6,17 +6,17 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (compact()) {
-      <div class="lp compact">
-        @if (showImage()) {
+      @if (showImage()) {
+        <div class="lp compact">
           <img class="lp-thumb" [src]="data()!.image" alt="" referrerpolicy="no-referrer" (error)="imgError.set(true)" />
-        } @else {
-          <div class="lp-thumb lp-ph"><span class="material-icons" aria-hidden="true">link</span></div>
-        }
-        <div class="lp-meta">
-          <span class="lp-title">{{ data()?.title || domain() }}</span>
-          <span class="lp-domain"><span class="material-icons" aria-hidden="true">public</span> {{ domain() }}</span>
+          <div class="lp-meta">
+            <span class="lp-title">{{ data()?.title || domain() }}</span>
+            <span class="lp-domain"><span class="material-icons" aria-hidden="true">public</span> {{ domain() }}</span>
+          </div>
         </div>
-      </div>
+      } @else {
+        <span class="lp chip"><span class="material-icons" aria-hidden="true">link</span> {{ domain() }}</span>
+      }
     } @else {
       <a class="lp full" [href]="url()" target="_blank" rel="noopener">
         @if (showImage()) {
@@ -43,6 +43,14 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
     .lp-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 12px; flex-shrink: 0; background: var(--surface-2); }
     .lp-ph { display: flex; align-items: center; justify-content: center; color: var(--muted); }
     .lp-ph .material-icons { font-size: 26px; }
+
+    .lp.chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 999px;
+      background: var(--surface-2); color: var(--muted);
+      font-size: 0.82rem; font-weight: 600;
+      .material-icons { font-size: 16px; }
+    }
 
     .lp.compact { display: flex; gap: 12px; align-items: center; }
     .lp.compact .lp-meta { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
