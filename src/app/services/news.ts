@@ -11,19 +11,21 @@ export interface NewsType {
   value: NewsTag;
   label: string;
   icon: string;
-  color: string;
+  color: string; // colore della pill
   text: string; // colore del testo sopra la pill (bianco, o scuro se pill chiara)
+  accent: string; // colore della striscia laterale della card
 }
 
 // Classificazione delle notizie — unica fonte: per aggiungere/rinominare un
 // tipo basta modificare questa lista (e l'enum NewsTag lato backend).
 export const NEWS_TYPES: NewsType[] = [
-  { value: 'Evento', label: 'Evento', icon: '🗓️', color: '#5e7d4f', text: '#fff' },
-  { value: 'Avviso', label: 'Avviso', icon: '⚠️', color: '#b3402f', text: '#fff' },
-  { value: 'ControlloVicinato', label: 'Controllo del vicinato', icon: '👁️', color: '#47617e', text: '#fff' },
-  { value: 'Info', label: 'Info', icon: 'ℹ️', color: '#7a5a3a', text: '#fff' },
-  { value: 'Comune', label: 'Comune', icon: '🏛️', color: '#8a7a5a', text: '#fff' },
-  { value: 'News', label: 'News', icon: '📰', color: '#ffffff', text: '#1c1b17' },
+  { value: 'Evento', label: 'Evento', icon: '🗓️', color: '#5e7d4f', text: '#fff', accent: '#5e7d4f' },
+  { value: 'Avviso', label: 'Avviso', icon: '⚠️', color: '#b3402f', text: '#fff', accent: '#b3402f' },
+  { value: 'ControlloVicinato', label: 'Controllo del vicinato', icon: '👁️', color: '#47617e', text: '#fff', accent: '#47617e' },
+  { value: 'Info', label: 'Info', icon: 'ℹ️', color: '#7a5a3a', text: '#fff', accent: '#7a5a3a' },
+  { value: 'Comune', label: 'Comune', icon: '🏛️', color: '#8a7a5a', text: '#fff', accent: '#8a7a5a' },
+  // News: pill bianca, ma la striscia della card usa il bordo neutro (niente striscia invisibile)
+  { value: 'News', label: 'News', icon: '📰', color: '#ffffff', text: '#1c1b17', accent: 'var(--line)' },
 ];
 
 const NEWS_TYPE_MAP = new Map(NEWS_TYPES.map((t) => [t.value, t]));

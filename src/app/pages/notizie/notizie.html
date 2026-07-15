@@ -9,7 +9,7 @@
       <li class="notizia-card"
           [class.has-cover]="!!n.coverImageUrl"
           [class.expanded]="n.expandedInHome"
-          [style.--type]="tipo(n.tag).color">
+          [style.--type]="tipo(n.tag).accent">
 
         @if (n.coverImageUrl && n.coverSize !== 'side') {
           @if (n.expandedInHome) {
