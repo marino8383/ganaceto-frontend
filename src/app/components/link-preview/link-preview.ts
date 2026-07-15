@@ -19,6 +19,11 @@ type Channel =
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <ng-template #chan>
+      @if (logoSrc() && !logoError()) {
+        <div class="chan-tile ch-logo">
+          <img [src]="logoSrc()!" alt="" (error)="logoError.set(true)" />
+        </div>
+      } @else {
       <div class="chan-tile" [class]="'ch-' + channel()">
         @switch (channel()) {
           @case ('facebook') { <span class="ch-letter">f</span> }
@@ -42,6 +47,7 @@ type Channel =
           @default { <span class="material-icons" aria-hidden="true">link</span> }
         }
       </div>
+      }
     </ng-template>
 
     @if (compact()) {
@@ -97,6 +103,8 @@ type Channel =
     .ch-solierese { background: #2e7d32; color: #fff; }
     .ch-villanova { background: #1565c0; color: #fff; }
     .ch-generic { background: var(--surface-2); color: var(--muted); }
+    .ch-logo { background: #fff; box-sizing: border-box; padding: 4px; }
+    .ch-logo img { width: 100%; height: 100%; object-fit: contain; }
 
     .lp-thumb {
       width: 72px; height: 72px; border-radius: 12px; overflow: hidden;
@@ -142,6 +150,17 @@ export class LinkPreview implements OnInit {
   readonly data = signal<LinkPreviewData | null>(null);
   readonly loading = signal(true);
   readonly imgError = signal(false);
+  readonly logoError = signal(false);
+
+  // Logo ufficiale dell'ente (file in public/). Se manca/non carica → iconcina.
+  readonly logoSrc = computed<string | null>(() => {
+    switch (this.channel()) {
+      case 'comune-modena': return '/logo-comune-modena.png';
+      case 'solierese': return '/logo-solierese.png';
+      case 'villanova': return '/logo-villanova.png';
+      default: return null;
+    }
+  });
 
   readonly showImage = computed(() => !!this.data()?.image && !this.imgError());
 
@@ -150,7 +169,7 @@ export class LinkPreview implements OnInit {
     // Enti locali prima (spesso condivisi via Facebook/sito): riconosco dal nome
     if (/comune\.modena\.it/.test(u)) return 'comune-modena';
     if (/solierese/.test(u)) return 'solierese';
-    if (/villanova/.test(u)) return 'villanova';
+    if (/villanova|4ville|pol4ville|quattroville/.test(u)) return 'villanova';
     // Piattaforme
     if (/t\.me|telegram\./.test(u)) return 'telegram';
     if (/facebook\.|fb\.me|fb\.watch/.test(u)) return 'facebook';
@@ -169,7 +188,7 @@ export class LinkPreview implements OnInit {
       case 'telegram': return 'Messaggio Telegram';
       case 'comune-modena': return 'Comune di Modena';
       case 'solierese': return 'Solierese Calcio';
-      case 'villanova': return 'Polisportiva Villanova';
+      case 'villanova': return 'Polisportiva 4 Ville';
       default: return 'Apri il link';
     }
   });
