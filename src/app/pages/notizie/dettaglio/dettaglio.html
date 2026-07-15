@@ -5,7 +5,19 @@
   </div>
 } @else if (notizia(); as n) {
   <article class="dettaglio-page">
-    <a class="back-link" routerLink="/notizie" aria-label="Torna alle notizie">← Notizie</a>
+    <div class="top-bar">
+      <a class="back-link" routerLink="/notizie" aria-label="Torna alle notizie">← Notizie</a>
+      @if (auth.isAdmin) {
+        <div class="admin-actions">
+          <button class="adm-btn" type="button" (click)="modifica(n)">
+            <span class="material-icons" aria-hidden="true">edit</span> Modifica
+          </button>
+          <button class="adm-btn danger" type="button" (click)="elimina(n)">
+            <span class="material-icons" aria-hidden="true">delete_outline</span> Elimina
+          </button>
+        </div>
+      }
+    </div>
 
     @if (n.coverImageUrl) {
       <div class="zoomable" (click)="zoom.set(true)">

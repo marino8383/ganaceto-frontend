@@ -4,15 +4,43 @@
   padding: 14px 14px 40px;
 }
 
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
 .back-link {
   display: inline-block;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--primary);
   text-decoration: none;
-  margin-bottom: 14px;
 
   &:hover { text-decoration: underline; }
+}
+
+.admin-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.adm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface, #fffdf9);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  .material-icons { font-size: 17px; }
+  &:hover { background: var(--surface-2); }
+  &.danger { color: #b3402f; border-color: rgba(179, 64, 47, 0.35); }
+  &.danger:hover { background: rgba(179, 64, 47, 0.08); }
 }
 
 .cover {

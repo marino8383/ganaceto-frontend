@@ -8,8 +8,9 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { News, NewsItem, newsType, newsTimeRange, externalChannelLabel } from '../../../services/news';
+import { Auth } from '../../../services/auth';
 import { renderNewsBody } from '../../../shared/format';
 import { LinkPreview } from '../../../components/link-preview/link-preview';
 
@@ -22,8 +23,10 @@ import { LinkPreview } from '../../../components/link-preview/link-preview';
 })
 export class NotiziaDettaglio implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly newsService = inject(News);
   private readonly sanitizer = inject(DomSanitizer);
+  readonly auth = inject(Auth);
 
   readonly notizia = signal<NewsItem | null>(null);
   readonly errore = signal(false);
@@ -55,6 +58,18 @@ export class NotiziaDettaglio implements OnInit {
     const n = this.notizia();
     return n ? this.sanitizer.bypassSecurityTrustHtml(renderNewsBody(n.body)) : null;
   });
+
+  // Azioni rapide admin
+  modifica(n: NewsItem): void {
+    this.router.navigate(['/admin/notizie'], { queryParams: { edit: n.id } });
+  }
+
+  elimina(n: NewsItem): void {
+    if (!confirm(`Eliminare la notizia "${n.title}"?`)) return;
+    this.newsService.delete(n.id).subscribe({
+      next: () => this.router.navigate(['/notizie']),
+    });
+  }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));

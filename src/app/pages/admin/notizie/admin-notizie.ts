@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { CoverSize, News, NewsItem, NewsTag, NEWS_TYPES, newsType } from '../../../services/news';
 import { ShareDraftService } from '../../../services/share-draft';
 import { htmlToPlain } from '../../../shared/format';
@@ -32,6 +33,7 @@ export class AdminNotizie implements OnInit {
   private readonly newsService = inject(News);
   private readonly fb = inject(FormBuilder);
   private readonly shareDraft = inject(ShareDraftService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly notizie = this.newsService.adminNotizie;
   readonly formMode = signal<FormMode>('closed');
@@ -78,6 +80,13 @@ export class AdminNotizie implements OnInit {
 
   ngOnInit(): void {
     this.newsService.loadAdminNotizie();
+
+    // Arrivo da "Modifica" nel dettaglio: /admin/notizie?edit=<id>
+    const editId = Number(this.route.snapshot.queryParamMap.get('edit'));
+    if (editId) {
+      this.newsService.getById(editId).subscribe({ next: (item) => this.openEdit(item) });
+      return;
+    }
 
     // Arrivo da "Condividi qui": apro la creazione già precompilata.
     const d = this.shareDraft.consume();
