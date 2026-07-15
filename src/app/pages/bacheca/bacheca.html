@@ -117,6 +117,28 @@
         @if (editingId() === msg.id) {
           <form class="edit-form" (ngSubmit)="salvaModifica(msg)">
             <textarea [formControl]="editControl" rows="3" maxlength="500" placeholder="Modifica il messaggio…"></textarea>
+
+            @if (editPhoto(); as p) {
+              <div class="edit-photo">
+                <img [src]="p" alt="Foto allegata" />
+                <button type="button" class="photo-x" (click)="removeEditPhoto()" aria-label="Rimuovi foto">✕</button>
+              </div>
+            }
+
+            <div class="edit-tools">
+              <label class="tool">
+                <input type="file" accept="image/*" (change)="onEditPhoto($event)" hidden />
+                <span class="material-icons" aria-hidden="true">photo_camera</span>
+                {{ editPhoto() ? 'Cambia foto' : 'Aggiungi foto' }}
+              </label>
+              @if (editHasPos()) {
+                <button type="button" class="tool" [class.off]="!editKeepPos()" (click)="toggleEditPos()">
+                  <span class="material-icons" aria-hidden="true">{{ editKeepPos() ? 'place' : 'location_off' }}</span>
+                  {{ editKeepPos() ? 'Posizione: attiva' : 'Posizione: rimossa' }}
+                </button>
+              }
+            </div>
+
             <div class="edit-actions">
               <button type="button" class="linkbtn" (click)="annullaModifica()">Annulla</button>
               <button type="submit" class="btn-salva" [disabled]="sending()">Salva</button>

@@ -73,6 +73,9 @@ export class Bacheca implements OnInit {
   // --- modifica di un proprio messaggio (solo senza risposte) ---
   readonly editingId = signal<number | null>(null);
   readonly editControl = this.fb.nonNullable.control('', Validators.maxLength(500));
+  readonly editPhoto = signal<string | null>(null); // stato foto in modifica
+  readonly editHasPos = signal(false); // il messaggio ha una posizione originale
+  readonly editKeepPos = signal(true); // mantenere la posizione?
 
   readonly composing = signal(false);
   readonly sending = signal(false);
@@ -296,6 +299,9 @@ export class Bacheca implements OnInit {
   startEdit(msg: MessaggioBacheca): void {
     this.editingId.set(msg.id);
     this.editControl.setValue(msg.testo ?? '');
+    this.editPhoto.set(msg.photoUrl);
+    this.editHasPos.set(msg.latitude !== null && msg.longitude !== null);
+    this.editKeepPos.set(true);
     this.error.set(null);
   }
 
@@ -303,16 +309,45 @@ export class Bacheca implements OnInit {
     this.editingId.set(null);
   }
 
+  onEditPhoto(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
+    if (file.size > MAX_PHOTO_BYTES) {
+      this.error.set('Immagine troppo grande (max 2 MB).');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.editPhoto.set(reader.result as string);
+      this.error.set(null);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeEditPhoto(): void {
+    this.editPhoto.set(null);
+  }
+
+  toggleEditPos(): void {
+    this.editKeepPos.update((v) => !v);
+  }
+
   salvaModifica(msg: MessaggioBacheca): void {
     const testo = this.editControl.getRawValue().trim();
-    if (!testo && !msg.photoUrl) {
-      this.error.set('Scrivi un messaggio o lascia la foto.');
+    const photo = this.editPhoto();
+    if (!testo && !photo) {
+      this.error.set('Scrivi un messaggio o allega una foto.');
       return;
     }
     if (this.sending()) return;
     this.sending.set(true);
     this.error.set(null);
-    this.api.update(msg.id, testo, msg.tag).subscribe({
+    const keepPos = this.editHasPos() && this.editKeepPos();
+    const lat = keepPos ? msg.latitude : null;
+    const lng = keepPos ? msg.longitude : null;
+    this.api.update(msg.id, testo, msg.tag, photo, lat, lng).subscribe({
       next: () => {
         this.editingId.set(null);
         this.sending.set(false);

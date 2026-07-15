@@ -271,6 +271,23 @@ textarea {
   padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px;
   background: var(--surface, #fffdf9); color: var(--text); resize: vertical;
 }
+.edit-photo { position: relative; margin-top: 8px; display: inline-block; }
+.edit-photo img { max-width: 100%; max-height: 220px; border-radius: 12px; display: block; }
+.edit-photo .photo-x {
+  position: absolute; top: 6px; right: 6px; width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: rgba(0, 0, 0, 0.6); color: #fff; cursor: pointer; font-size: 0.85rem;
+}
+
+.edit-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.edit-tools .tool {
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+  padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface, #fffdf9); color: var(--text); font: inherit; font-size: 0.82rem; font-weight: 600;
+  .material-icons { font-size: 17px; }
+  &:hover { background: var(--surface-2); }
+  &.off { color: var(--muted); border-style: dashed; }
+}
+
 .edit-actions { display: flex; gap: 8px; justify-content: flex-end; align-items: center; margin-top: 8px; }
 .btn-salva {
   border: none; background: var(--accent); color: #fff; font: inherit; font-weight: 700;
