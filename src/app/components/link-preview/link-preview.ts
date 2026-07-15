@@ -172,7 +172,7 @@ export class LinkPreview implements OnInit {
     const ente = `${u} ${(d?.title ?? '').toLowerCase()} ${(d?.siteName ?? '').toLowerCase()}`;
     if (/comune\.modena\.it|comune di modena/.test(ente)) return 'comune-modena';
     if (/solierese/.test(ente)) return 'solierese';
-    if (/villanova|quattroville|pol4ville|4[\s_-]?ville/.test(ente)) return 'villanova';
+    if (/villanova|quattroville|pol4ville|4[\s_-]?ville|100063819361842/.test(ente)) return 'villanova';
     // Piattaforme (solo dall'URL, per non confondere parole nel testo)
     if (/t\.me|telegram\./.test(u)) return 'telegram';
     if (/facebook\.|fb\.me|fb\.watch/.test(u)) return 'facebook';
