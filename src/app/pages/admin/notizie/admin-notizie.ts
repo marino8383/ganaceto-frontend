@@ -15,8 +15,10 @@ import { htmlToPlain } from '../../../shared/format';
 
 type FormMode = 'closed' | 'create' | 'edit';
 
-// dimensione massima copertina caricata da dispositivo (evita payload enormi in DB)
-const MAX_COVER_BYTES = 2 * 1024 * 1024; // 2 MB
+// limite del file in ingresso (poi l'immagine viene ridimensionata/compressa)
+const MAX_INPUT_BYTES = 20 * 1024 * 1024; // 20 MB
+// lato lungo massimo della copertina salvata (contiene il peso del base64 nel DB)
+const MAX_COVER_DIM = 1600;
 
 @Component({
   selector: 'app-admin-notizie',
@@ -24,6 +26,7 @@ const MAX_COVER_BYTES = 2 * 1024 * 1024; // 2 MB
   templateUrl: './admin-notizie.html',
   styleUrl: './admin-notizie.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(document:paste)': 'onPaste($event)' },
 })
 export class AdminNotizie implements OnInit {
   private readonly newsService = inject(News);
@@ -125,21 +128,94 @@ export class AdminNotizie implements OnInit {
   onCoverSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file) return;
+    input.value = ''; // consente di ricaricare lo stesso file
+    if (file) void this.fileToCover(file);
+  }
 
-    if (file.size > MAX_COVER_BYTES) {
-      this.error.set('Immagine troppo grande (max 2 MB).');
-      input.value = '';
+  // Incolla un'immagine dagli appunti (Ctrl/Cmd+V) mentre il form è aperto.
+  onPaste(event: ClipboardEvent): void {
+    if (this.formMode() === 'closed') return;
+    const items = event.clipboardData?.items;
+    if (!items) return;
+    for (const it of Array.from(items)) {
+      if (it.kind === 'file' && it.type.startsWith('image/')) {
+        const file = it.getAsFile();
+        if (file) {
+          event.preventDefault();
+          void this.fileToCover(file);
+        }
+        return;
+      }
+    }
+  }
+
+  // Pulsante "Incolla": legge gli appunti (Chrome/Edge desktop). Fallback: Ctrl+V.
+  async pasteFromClipboard(): Promise<void> {
+    if (!navigator.clipboard?.read) {
+      this.error.set('Usa Ctrl+V per incollare l’immagine.');
       return;
     }
+    try {
+      const items = await navigator.clipboard.read();
+      for (const item of items) {
+        const type = item.types.find((t) => t.startsWith('image/'));
+        if (type) {
+          const blob = await item.getType(type);
+          void this.fileToCover(new File([blob], 'incolla.png', { type }));
+          return;
+        }
+      }
+      this.error.set('Negli appunti non c’è un’immagine.');
+    } catch {
+      this.error.set('Permesso appunti negato: prova con Ctrl+V.');
+    }
+  }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.cover.set(reader.result as string);
+  private async fileToCover(file: File): Promise<void> {
+    if (!file.type.startsWith('image/')) {
+      this.error.set('Il file incollato non è un’immagine.');
+      return;
+    }
+    if (file.size > MAX_INPUT_BYTES) {
+      this.error.set('Immagine troppo grande.');
+      return;
+    }
+    try {
+      this.cover.set(await this.compressImage(file));
       this.error.set(null);
-    };
-    reader.readAsDataURL(file);
-    input.value = ''; // consente di ricaricare lo stesso file
+    } catch {
+      this.error.set('Impossibile leggere l’immagine.');
+    }
+  }
+
+  // Ridimensiona (lato lungo ≤ 1600px) e comprime in JPEG: gli screenshot grandi
+  // entrano senza appesantire il DB (le copertine sono salvate come data URL).
+  private compressImage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, MAX_COVER_DIM / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject();
+          return;
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject();
+      };
+      img.src = url;
+    });
   }
 
   removeCover(): void {

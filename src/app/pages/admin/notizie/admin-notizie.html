@@ -69,11 +69,14 @@
               <button class="cover-remove" type="button" (click)="removeCover()" aria-label="Rimuovi copertina">✕</button>
             </div>
           }
-          <label class="cover-pick">
-            <input type="file" accept="image/*" (change)="onCoverSelected($event)" hidden />
-            <span>{{ cover() ? '🔄 Cambia immagine' : '📷 Scegli o scatta una foto' }}</span>
-          </label>
-          <span class="field-hint">Facoltativa · max 2 MB</span>
+          <div class="cover-actions">
+            <label class="cover-pick">
+              <input type="file" accept="image/*" (change)="onCoverSelected($event)" hidden />
+              <span>{{ cover() ? '🔄 Cambia immagine' : '📷 Scegli o scatta una foto' }}</span>
+            </label>
+            <button class="cover-paste" type="button" (click)="pasteFromClipboard()">📋 Incolla immagine</button>
+          </div>
+          <span class="field-hint">Facoltativa · puoi anche <b>incollare</b> con Ctrl+V · ridimensionata in automatico</span>
 
           @if (cover()) {
             <div class="cover-size">
