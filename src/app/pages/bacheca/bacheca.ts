@@ -83,6 +83,16 @@ export class Bacheca implements OnInit {
 
   private readonly mapCache = new Map<string, SafeResourceUrl>();
 
+  // foto profilo che non si caricano (es. 403 da Google) → fallback all'iniziale
+  private readonly brokenPics = signal<ReadonlySet<string>>(new Set());
+  showPic(url: string | null): url is string {
+    return !!url && !this.brokenPics().has(url);
+  }
+  picBroken(url: string | null): void {
+    if (!url) return;
+    this.brokenPics.update((s) => new Set(s).add(url));
+  }
+
   // deep-link da notifica: /bacheca?msg=ID → scorre al messaggio e lo evidenzia
   private readonly pendingHighlight = signal<number | null>(null);
   readonly highlightId = signal<number | null>(null);

@@ -160,7 +160,12 @@ textarea {
 
 .messaggi-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px; }
 
+/* riga: tondino account a lato + box messaggio (stile chat) */
+.msg-row { display: flex; align-items: flex-start; gap: 10px; }
+
 .messaggio-card {
+  flex: 1;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -224,13 +229,15 @@ textarea {
 .msg-foot { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .foot-meta { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
 .avatar {
-  width: 30px; height: 30px; flex-shrink: 0;
+  width: 38px; height: 38px; flex-shrink: 0;
   border-radius: 50%;
   background: var(--primary); color: #fff;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 0.85rem;
-  &.g { background: var(--accent); width: 26px; height: 26px; font-size: 0.78rem; }
+  font-weight: 700; font-size: 1rem;
+  margin-top: 2px; /* allinea otticamente al bordo del box */
+  &.g { background: var(--accent); width: 28px; height: 28px; font-size: 0.78rem; }
 }
+img.avatar { object-fit: cover; border: 1px solid var(--line); }
 .autore { font-weight: 700; font-size: 0.9rem; color: var(--text); flex: 1; min-width: 0; line-height: 1.2; }
 .badge-tuo {
   margin-left: 5px; font-size: 0.62rem; font-weight: 700;
@@ -325,6 +332,8 @@ textarea {
   border-left: 2px solid var(--line);
   display: flex; flex-direction: column; gap: 10px;
 }
+.risposta { display: flex; align-items: flex-start; gap: 8px; }
+.risposta-body { flex: 1; min-width: 0; }
 .risposta .mtext { margin-top: 5px; font-size: 0.9rem; }
 
 .reply-form { margin-top: 10px; }

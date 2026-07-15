@@ -87,9 +87,15 @@
 
   <ul class="messaggi-list" aria-label="Messaggi bacheca">
     @for (msg of filtered(); track msg.id) {
-      <li class="messaggio-card" [id]="'msg-' + msg.id" [class.highlight]="highlightId() === msg.id">
-        <div class="mhead">
+      <li class="msg-row" [id]="'msg-' + msg.id">
+        <!-- tondino account a lato del box (foto Google, fallback iniziale) -->
+        @if (showPic(msg.userPicture)) {
+          <img class="avatar" [src]="msg.userPicture" alt="" referrerpolicy="no-referrer" (error)="picBroken(msg.userPicture)" />
+        } @else {
           <span class="avatar" aria-hidden="true">{{ msg.userDisplayName.charAt(0).toUpperCase() }}</span>
+        }
+        <div class="messaggio-card" [class.highlight]="highlightId() === msg.id">
+        <div class="mhead">
           <span class="autore">
             {{ msg.userDisplayName }}
             @if (msg.isOwner) { <span class="badge-tuo">tuo</span> }
@@ -180,15 +186,21 @@
           <ul class="risposte-list" aria-label="Risposte">
             @for (r of msg.risposte; track r.id) {
               <li class="risposta">
-                <div class="mhead">
+                @if (showPic(r.userPicture)) {
+                  <img class="avatar g" [src]="r.userPicture" alt="" referrerpolicy="no-referrer" (error)="picBroken(r.userPicture)" />
+                } @else {
                   <span class="avatar g" aria-hidden="true">{{ r.userDisplayName.charAt(0).toUpperCase() }}</span>
-                  <span class="autore">{{ r.userDisplayName }}@if (r.isOwner) { <span class="badge-tuo">tuo</span> }</span>
-                  <time class="mtime" [attr.datetime]="r.createdAt">{{ r.createdAt | date: 'dd/MM HH:mm' }}</time>
-                  @if (canDelete(r)) {
-                    <button class="del" (click)="eliminaRisposta(r.id)" title="Elimina"><span class="material-icons" aria-hidden="true">delete_outline</span></button>
-                  }
+                }
+                <div class="risposta-body">
+                  <div class="mhead">
+                    <span class="autore">{{ r.userDisplayName }}@if (r.isOwner) { <span class="badge-tuo">tuo</span> }</span>
+                    <time class="mtime" [attr.datetime]="r.createdAt">{{ r.createdAt | date: 'dd/MM HH:mm' }}</time>
+                    @if (canDelete(r)) {
+                      <button class="del" (click)="eliminaRisposta(r.id)" title="Elimina"><span class="material-icons" aria-hidden="true">delete_outline</span></button>
+                    }
+                  </div>
+                  <p class="mtext">{{ r.testo }}</p>
                 </div>
-                <p class="mtext">{{ r.testo }}</p>
               </li>
             }
           </ul>
@@ -217,6 +229,7 @@
             </div>
           </form>
         }
+        </div><!-- /messaggio-card -->
       </li>
     }
   </ul>

@@ -13,6 +13,7 @@ export type BachecaTag =
 export interface RispostaBacheca {
   id: number;
   userDisplayName: string;
+  userPicture: string | null;
   testo: string;
   createdAt: string;
   isOwner: boolean;
@@ -21,6 +22,7 @@ export interface RispostaBacheca {
 export interface MessaggioBacheca {
   id: number;
   userDisplayName: string;
+  userPicture: string | null;
   testo: string;
   tag: BachecaTag;
   photoUrl: string | null;
