@@ -49,3 +49,48 @@ h1, h2, h3, .font-serif { font-family: 'Fraunces', serif; }
   &:hover { background: #128c7e14; }
 }
 .content-link { color: var(--primary); word-break: break-word; }
+
+// Contatti incolonnati: nome | 📞 numero | 💬 WhatsApp allineati
+.contact-grid {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 7px 12px;
+  align-items: center;
+  margin: 0 0 1rem;
+}
+.contact-grid .c-name { font-weight: 700; }
+.contact-grid .c-phone { white-space: nowrap; }
+.contact-grid .c-wa { justify-self: start; }
+.contact-grid .c-full { grid-column: 1 / -1; }
+
+// Lightbox immagine (tocca per ingrandire)
+.img-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: lightboxFade 0.15s ease;
+}
+.img-lightbox img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+.img-lightbox .lb-close {
+  position: absolute; top: 14px; right: 16px;
+  width: 44px; height: 44px; border-radius: 50%; border: none;
+  background: rgba(255, 255, 255, 0.15); color: #fff; font-size: 1.2rem; cursor: pointer;
+}
+@keyframes lightboxFade { from { opacity: 0; } to { opacity: 1; } }
+
+// Suggerimento "tocca per ingrandire" sulle copertine ingrandibili
+.zoomable { position: relative; cursor: zoom-in; display: block; }
+.zoomable img { cursor: zoom-in; }
+.zoom-hint {
+  position: absolute; bottom: 8px; right: 8px;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(0, 0, 0, 0.55); color: #fff;
+  border-radius: 999px; padding: 3px 9px; font-size: 0.72rem; font-weight: 600;
+  pointer-events: none;
+  .material-icons { font-size: 15px; }
+}

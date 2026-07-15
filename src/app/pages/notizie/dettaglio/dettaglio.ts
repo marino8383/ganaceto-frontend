@@ -30,6 +30,7 @@ export class NotiziaDettaglio implements OnInit {
   readonly orario = newsTimeRange;
   readonly channelLabel = externalChannelLabel;
   readonly copied = signal(false);
+  readonly zoom = signal(false);
 
   // Condivisione: usa il menu nativo del dispositivo se disponibile, altrimenti
   // copia il link (che punta alla pagina "vetrina" con l'anteprima social).

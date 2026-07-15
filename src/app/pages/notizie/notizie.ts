@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
@@ -18,6 +18,7 @@ export class Notizie implements OnInit {
   readonly notizie = this.newsService.notizie;
   readonly tipo = newsType;
   readonly orario = newsTimeRange;
+  readonly zoom = signal<string | null>(null); // src immagine ingrandita
 
   // contenuto delle notizie "estese" mostrato inline: HTML scritto solo dall'admin
   private readonly safeCache = new Map<string, SafeHtml>();

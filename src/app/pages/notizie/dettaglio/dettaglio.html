@@ -8,7 +8,10 @@
     <a class="back-link" routerLink="/notizie" aria-label="Torna alle notizie">← Notizie</a>
 
     @if (n.coverImageUrl) {
-      <img class="cover" [attr.data-size]="n.coverSize || 'medium'" [src]="n.coverImageUrl" [alt]="n.title" />
+      <div class="zoomable" (click)="zoom.set(true)">
+        <img class="cover" [attr.data-size]="n.coverSize || 'medium'" [src]="n.coverImageUrl" [alt]="n.title" />
+        <span class="zoom-hint"><span class="material-icons" aria-hidden="true">zoom_in</span> ingrandisci</span>
+      </div>
     }
 
     <header class="dettaglio-header">
@@ -37,6 +40,13 @@
     </div>
 
     <time class="pub-date" [attr.datetime]="n.publishedAt">Pubblicata il {{ n.publishedAt | date: 'dd/MM/yyyy HH:mm' }}</time>
+
+    @if (zoom() && n.coverImageUrl) {
+      <div class="img-lightbox" (click)="zoom.set(false)">
+        <img [src]="n.coverImageUrl" [alt]="n.title" />
+        <button class="lb-close" type="button" (click)="zoom.set(false)" aria-label="Chiudi">✕</button>
+      </div>
+    }
   </article>
 } @else {
   <div class="dettaglio-page dettaglio-loading" aria-busy="true" aria-live="polite">

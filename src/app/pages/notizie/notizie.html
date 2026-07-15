@@ -12,10 +12,18 @@
           [style.--type]="tipo(n.tag).color">
 
         @if (n.coverImageUrl) {
-          <a class="cover" [attr.data-size]="n.coverSize || 'medium'" [routerLink]="['/notizie', n.id]" [attr.aria-label]="'Apri: ' + n.title">
-            <img [src]="n.coverImageUrl" [alt]="n.title" />
-            <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
-          </a>
+          @if (n.expandedInHome) {
+            <div class="cover zoomable" [attr.data-size]="n.coverSize || 'medium'" (click)="zoom.set(n.coverImageUrl)">
+              <img [src]="n.coverImageUrl" [alt]="n.title" />
+              <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
+              <span class="zoom-hint"><span class="material-icons" aria-hidden="true">zoom_in</span> ingrandisci</span>
+            </div>
+          } @else {
+            <a class="cover" [attr.data-size]="n.coverSize || 'medium'" [routerLink]="['/notizie', n.id]" [attr.aria-label]="'Apri: ' + n.title">
+              <img [src]="n.coverImageUrl" [alt]="n.title" />
+              <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
+            </a>
+          }
         }
 
         <div class="notizia-body">
@@ -45,4 +53,11 @@
       </li>
     }
   </ul>
+
+  @if (zoom(); as src) {
+    <div class="img-lightbox" (click)="zoom.set(null)">
+      <img [src]="src" alt="" />
+      <button class="lb-close" type="button" (click)="zoom.set(null)" aria-label="Chiudi">✕</button>
+    </div>
+  }
 </div>

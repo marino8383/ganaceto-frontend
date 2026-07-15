@@ -26,11 +26,77 @@ export function plainTextToHtml(text: string): string {
 }
 
 // Rende il corpo notizia: se è già HTML (notizie vecchie) lo usa così com'è,
-// altrimenti impagina il testo semplice. In ogni caso rende attivi telefoni/link.
+// altrimenti impagina il testo semplice. In ogni caso rende attivi telefoni/link
+// e incolonna le righe di contatto ("Nome: numero" → nome | 📞 | 💬).
 export function renderNewsBody(body: string): string {
   if (!body) return '';
   const html = HAS_TAGS.test(body) ? body : plainTextToHtml(body);
-  return linkifyHtml(html);
+  const doc = new DOMParser().parseFromString(linkifyHtml(html), 'text/html');
+  groupContacts(doc);
+  return doc.body.innerHTML;
+}
+
+// Divide i figli di un <p> in "righe" separate dai <br>.
+function splitByBr(p: HTMLElement): ChildNode[][] {
+  const lines: ChildNode[][] = [[]];
+  for (const node of Array.from(p.childNodes)) {
+    if (node.nodeName === 'BR') lines.push([]);
+    else lines[lines.length - 1].push(node);
+  }
+  return lines;
+}
+
+function isBlank(nodes: ChildNode[]): boolean {
+  return nodes.every((n) => n.nodeType === 3 && !(n.nodeValue ?? '').trim());
+}
+
+// Una riga è "contatto" se è esattamente: testo "Etichetta:" + un solo .phone-group.
+function parseContactLine(nodes: ChildNode[]): { label: string; group: Element } | null {
+  const meaningful = nodes.filter((n) => !(n.nodeType === 3 && !(n.nodeValue ?? '').trim()));
+  if (meaningful.length !== 2) return null;
+  const [first, second] = meaningful;
+  if (first.nodeType !== 3) return null;
+  const m = (first.nodeValue ?? '').match(/^\s*([^:]{1,24}):\s*$/);
+  if (!m) return null;
+  if (!(second instanceof Element) || !second.classList.contains('phone-group')) return null;
+  return { label: m[1].trim(), group: second };
+}
+
+// Trasforma i <p> che contengono righe di contatto in una griglia a colonne.
+function groupContacts(doc: Document): void {
+  for (const p of Array.from(doc.body.querySelectorAll('p'))) {
+    const lines = splitByBr(p);
+    const parsed = lines.map(parseContactLine);
+    if (!parsed.some(Boolean)) continue; // nessun contatto: lascio il paragrafo com'è
+
+    const grid = doc.createElement('div');
+    grid.className = 'contact-grid';
+
+    lines.forEach((nodes, i) => {
+      const c = parsed[i];
+      if (c) {
+        const name = doc.createElement('span');
+        name.className = 'c-name';
+        name.textContent = c.label;
+        const phone = doc.createElement('span');
+        phone.className = 'c-phone';
+        const wa = doc.createElement('span');
+        wa.className = 'c-wa';
+        const call = c.group.querySelector('.phone-call');
+        const waLink = c.group.querySelector('.phone-wa');
+        if (call) phone.appendChild(call);
+        if (waLink) wa.appendChild(waLink);
+        grid.append(name, phone, wa);
+      } else if (!isBlank(nodes)) {
+        const full = doc.createElement('div');
+        full.className = 'c-full';
+        nodes.forEach((n) => full.appendChild(n));
+        grid.appendChild(full);
+      }
+    });
+
+    p.replaceWith(grid);
+  }
 }
 
 // HTML → testo semplice (per ricaricare in modifica le notizie vecchie senza tag).
