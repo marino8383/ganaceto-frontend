@@ -166,11 +166,14 @@ export class LinkPreview implements OnInit {
 
   readonly channel = computed<Channel>(() => {
     const u = this.url().toLowerCase();
-    // Enti locali prima (spesso condivisi via Facebook/sito): riconosco dal nome
-    if (/comune\.modena\.it/.test(u)) return 'comune-modena';
-    if (/solierese/.test(u)) return 'solierese';
-    if (/villanova|quattroville|pol4ville|4[\s_-]?ville/.test(u)) return 'villanova';
-    // Piattaforme
+    const d = this.data();
+    // Enti: cerco nell'URL + nel nome pagina/titolo dai metadati (i link Facebook
+    // "share/p/..." sono opachi, ma l'og:title contiene il nome della pagina).
+    const ente = `${u} ${(d?.title ?? '').toLowerCase()} ${(d?.siteName ?? '').toLowerCase()}`;
+    if (/comune\.modena\.it|comune di modena/.test(ente)) return 'comune-modena';
+    if (/solierese/.test(ente)) return 'solierese';
+    if (/villanova|quattroville|pol4ville|4[\s_-]?ville/.test(ente)) return 'villanova';
+    // Piattaforme (solo dall'URL, per non confondere parole nel testo)
     if (/t\.me|telegram\./.test(u)) return 'telegram';
     if (/facebook\.|fb\.me|fb\.watch/.test(u)) return 'facebook';
     if (/instagram\./.test(u)) return 'instagram';
