@@ -15,7 +15,7 @@
     }
 
     <header class="dettaglio-header">
-      <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
+      <span class="notizia-tag" [style.background]="tipo(n.tag).color" [style.color]="tipo(n.tag).text">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
     </header>
 
     @if (n.referenceDate) {

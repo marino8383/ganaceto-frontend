@@ -15,13 +15,13 @@
           @if (n.expandedInHome) {
             <div class="cover zoomable" [attr.data-size]="n.coverSize || 'medium'" (click)="zoom.set(n.coverImageUrl)">
               <img [src]="n.coverImageUrl" [alt]="n.title" />
-              <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
+              <span class="notizia-tag" [style.background]="tipo(n.tag).color" [style.color]="tipo(n.tag).text">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
               <span class="zoom-hint"><span class="material-icons" aria-hidden="true">zoom_in</span> ingrandisci</span>
             </div>
           } @else {
             <a class="cover" [attr.data-size]="n.coverSize || 'medium'" [routerLink]="['/notizie', n.id]" [attr.aria-label]="'Apri: ' + n.title">
               <img [src]="n.coverImageUrl" [alt]="n.title" />
-              <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
+              <span class="notizia-tag" [style.background]="tipo(n.tag).color" [style.color]="tipo(n.tag).text">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
             </a>
           }
         }
@@ -33,7 +33,7 @@
             </a>
           }
           @if (!n.coverImageUrl || n.coverSize === 'side') {
-            <span class="notizia-tag" [style.background]="tipo(n.tag).color">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
+            <span class="notizia-tag" [style.background]="tipo(n.tag).color" [style.color]="tipo(n.tag).text">{{ tipo(n.tag).icon }} {{ tipo(n.tag).label }}</span>
           }
 
           @if (n.referenceDate) {

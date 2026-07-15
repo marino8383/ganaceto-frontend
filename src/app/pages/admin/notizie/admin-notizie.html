@@ -34,7 +34,7 @@
         </div>
 
         <div class="field">
-          <label for="f-body">Contenuto *</label>
+          <label for="f-body">Contenuto <span class="field-hint">(facoltativo)</span></label>
           <div class="mini-tools">
             <button type="button" (click)="wrap('**')" title="Grassetto: seleziona il testo e premi"><b>B</b></button>
             <button type="button" (click)="wrap('_')" title="Corsivo: seleziona il testo e premi"><i>I</i></button>
@@ -131,7 +131,7 @@
     @for (item of notizie(); track item.id) {
       <li class="news-row" [class.hidden]="!item.isVisible">
         <div class="news-info">
-          <span class="news-tag" [style.background]="tipo(item.tag).color">{{ tipo(item.tag).icon }} {{ tipo(item.tag).label }}</span>
+          <span class="news-tag" [style.background]="tipo(item.tag).color" [style.color]="tipo(item.tag).text">{{ tipo(item.tag).icon }} {{ tipo(item.tag).label }}</span>
           <span class="news-date">{{ item.publishedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
           <span class="news-title">{{ item.title }}</span>
           @if (!item.isVisible) {

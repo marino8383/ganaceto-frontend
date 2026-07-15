@@ -65,7 +65,7 @@ export class AdminNotizie implements OnInit {
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(200)]],
-    body: ['', Validators.required], // testo semplice; l'app lo impagina in automatico
+    body: [''], // facoltativo: testo semplice; l'app lo impagina in automatico
     tag: ['Evento' as NewsTag, Validators.required],
     isVisible: [true],
     expandedInHome: [false],
@@ -83,9 +83,10 @@ export class AdminNotizie implements OnInit {
     const d = this.shareDraft.consume();
     if (d) {
       this.openCreate();
+      // Da condivisione: tipo "News", testo lasciato vuoto (facoltativo).
       this.form.patchValue({
-        title: d.title || d.text.slice(0, 80) || 'Dal web',
-        body: d.text || d.title || '',
+        tag: 'News',
+        title: d.title || 'Dal web',
         externalUrl: d.url || '',
       });
     }
