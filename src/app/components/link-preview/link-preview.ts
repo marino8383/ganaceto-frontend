@@ -1,30 +1,60 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { News, LinkPreview as LinkPreviewData } from '../../services/news';
+
+type Channel = 'facebook' | 'instagram' | 'whatsapp' | 'youtube' | 'generic';
 
 @Component({
   selector: 'app-link-preview',
+  imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+    <ng-template #chan>
+      <div class="chan-tile" [class]="'ch-' + channel()">
+        @switch (channel()) {
+          @case ('facebook') { <span class="ch-letter">f</span> }
+          @case ('instagram') {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" fill="none" stroke="currentColor" stroke-width="2" />
+              <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="2" />
+              <circle cx="17.6" cy="6.4" r="1.4" fill="currentColor" />
+            </svg>
+          }
+          @case ('whatsapp') {
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M6.6 10.8c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+            </svg>
+          }
+          @case ('youtube') { <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5v14l11-7z" /></svg> }
+          @default { <span class="material-icons" aria-hidden="true">link</span> }
+        }
+      </div>
+    </ng-template>
+
     @if (compact()) {
-      @if (showImage()) {
-        <div class="lp compact">
-          <img class="lp-thumb" [src]="data()!.image" alt="" referrerpolicy="no-referrer" (error)="imgError.set(true)" />
-          <div class="lp-meta">
-            <span class="lp-title">{{ data()?.title || domain() }}</span>
-            <span class="lp-domain"><span class="material-icons" aria-hidden="true">public</span> {{ domain() }}</span>
-          </div>
+      <div class="lp compact">
+        <div class="lp-thumb">
+          @if (showImage()) {
+            <img [src]="data()!.image" alt="" referrerpolicy="no-referrer" (error)="imgError.set(true)" />
+          } @else {
+            <ng-container [ngTemplateOutlet]="chan" />
+          }
         </div>
-      } @else {
-        <span class="lp chip"><span class="material-icons" aria-hidden="true">link</span> {{ domain() }}</span>
-      }
+        <div class="lp-meta">
+          <span class="lp-title">{{ data()?.title || channelLabel() }}</span>
+          <span class="lp-domain"><span class="material-icons" aria-hidden="true">public</span> {{ domain() }}</span>
+        </div>
+      </div>
     } @else {
       <a class="lp full" [href]="url()" target="_blank" rel="noopener">
         @if (showImage()) {
           <img class="lp-cover" [src]="data()!.image" alt="" referrerpolicy="no-referrer" (error)="imgError.set(true)" />
+        } @else {
+          <div class="lp-band"><ng-container [ngTemplateOutlet]="chan" /></div>
         }
         <div class="lp-body">
           <span class="lp-domain"><span class="material-icons" aria-hidden="true">public</span> {{ domain() }}</span>
-          <span class="lp-title">{{ data()?.title || 'Apri il link' }}</span>
+          <span class="lp-title">{{ data()?.title || channelLabel() }}</span>
           @if (data()?.description) { <span class="lp-desc">{{ data()!.description }}</span> }
           <span class="lp-open"><span class="material-icons" aria-hidden="true">open_in_new</span> Apri l'originale</span>
         </div>
@@ -40,17 +70,22 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
       font-size: 0.74rem; color: var(--muted);
       .material-icons { font-size: 14px; }
     }
-    .lp-thumb { width: 72px; height: 72px; object-fit: cover; border-radius: 12px; flex-shrink: 0; background: var(--surface-2); }
-    .lp-ph { display: flex; align-items: center; justify-content: center; color: var(--muted); }
-    .lp-ph .material-icons { font-size: 26px; }
 
-    .lp.chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; border-radius: 999px;
-      background: var(--surface-2); color: var(--muted);
-      font-size: 0.82rem; font-weight: 600;
-      .material-icons { font-size: 16px; }
+    .chan-tile { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .chan-tile svg { width: 52%; height: 52%; }
+    .ch-letter { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-size: 2.1em; line-height: 1; }
+    .ch-facebook { background: #1877f2; color: #fff; }
+    .ch-instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); color: #fff; }
+    .ch-whatsapp { background: #25d366; color: #fff; }
+    .ch-youtube { background: #ff0000; color: #fff; }
+    .ch-generic { background: var(--surface-2); color: var(--muted); }
+    .ch-generic .material-icons { font-size: 26px; }
+
+    .lp-thumb {
+      width: 72px; height: 72px; border-radius: 12px; overflow: hidden;
+      flex-shrink: 0; background: var(--surface-2); font-size: 20px;
     }
+    .lp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .lp.compact { display: flex; gap: 12px; align-items: center; }
     .lp.compact .lp-meta { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
@@ -66,6 +101,7 @@ import { News, LinkPreview as LinkPreviewData } from '../../services/news';
     }
     .lp.full:hover { border-color: var(--primary); }
     .lp-cover { width: 100%; max-height: 300px; object-fit: cover; display: block; background: var(--surface-2); }
+    .lp-band { height: 110px; font-size: 34px; }
     .lp-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 5px; }
     .lp.full .lp-title { font-size: 1rem; line-height: 1.3; }
     .lp-desc {
@@ -90,8 +126,26 @@ export class LinkPreview implements OnInit {
   readonly loading = signal(true);
   readonly imgError = signal(false);
 
-  // Mostro l'immagine solo se c'è ed è caricabile (Facebook & co. spesso la bloccano).
   readonly showImage = computed(() => !!this.data()?.image && !this.imgError());
+
+  readonly channel = computed<Channel>(() => {
+    const u = this.url().toLowerCase();
+    if (/facebook\.|fb\.me|fb\.watch/.test(u)) return 'facebook';
+    if (/instagram\./.test(u)) return 'instagram';
+    if (/wa\.me|whatsapp\.|chat\.whatsapp/.test(u)) return 'whatsapp';
+    if (/youtube\.|youtu\.be/.test(u)) return 'youtube';
+    return 'generic';
+  });
+
+  readonly channelLabel = computed(() => {
+    switch (this.channel()) {
+      case 'facebook': return 'Post su Facebook';
+      case 'instagram': return 'Post su Instagram';
+      case 'whatsapp': return 'Messaggio WhatsApp';
+      case 'youtube': return 'Video su YouTube';
+      default: return 'Apri il link';
+    }
+  });
 
   readonly domain = computed(() => {
     try {
