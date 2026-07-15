@@ -251,12 +251,16 @@ export class Bacheca implements OnInit {
       });
   }
 
-  // Link condiviso nel testo del post → anteprima
-  private static readonly URL_RE = /https?:\/\/[^\s]+/i;
+  // Link condiviso nel testo del post → anteprima. Riconosce anche URL senza
+  // schema (es. "share.google/...", "comune.modena.it/...") con TLD noto.
+  private static readonly URL_RE =
+    /(https?:\/\/[^\s]+|www\.[^\s]+|(?:[a-z0-9][a-z0-9-]*\.)+(?:com|org|net|it|eu|info|me|tv|app|io|dev|google|edu|gov)(?:\/[^\s]*)?)/i;
 
   firstUrl(testo: string | null): string | null {
     const m = testo?.match(Bacheca.URL_RE);
-    return m ? m[0] : null;
+    if (!m) return null;
+    const u = m[0];
+    return /^https?:\/\//i.test(u) ? u : 'https://' + u;
   }
 
   textWithoutUrl(testo: string | null): string {
