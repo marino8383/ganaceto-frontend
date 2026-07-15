@@ -115,7 +115,8 @@
         </div>
 
         @if (editingId() === msg.id) {
-          <form class="edit-form" (ngSubmit)="salvaModifica(msg)">
+          <!-- niente [formGroup] (FormControl singolo): (ngSubmit) non si aggancia, serve (submit) nativo -->
+          <form class="edit-form" (submit)="$event.preventDefault(); salvaModifica(msg)">
             <textarea [formControl]="editControl" rows="3" maxlength="500" placeholder="Modifica il messaggio…"></textarea>
 
             @if (editPhoto(); as p) {
