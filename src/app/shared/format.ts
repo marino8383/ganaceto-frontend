@@ -41,7 +41,11 @@ export function renderNewsBody(body: string): string {
 // Per ogni telefono risale all'etichetta "Nome:" che lo precede. I telefoni
 // senza etichetta restano nel testo; l'eventuale intro resta come paragrafo.
 function groupContacts(doc: Document): void {
-  const NAME = /([\p{L}\p{M}.'’\- ]{1,30}?)\s*:\s*$/u;
+  // "Nome:" (qualsiasi etichetta seguita da due punti)
+  const NAME_COLON = /(.{1,40}?)\s*:\s*$/u;
+  // "Nome" senza due punti: 1-2 parole con iniziale maiuscola subito prima del numero
+  // (prende "Fabrizio", "Mario Rossi"; ignora prosa minuscola come "al numero")
+  const NAME_BARE = /(\p{Lu}[\p{L}\p{M}.'’-]*(?:\s+\p{Lu}[\p{L}\p{M}.'’-]*)?)\s*$/u;
 
   for (const p of Array.from(doc.body.querySelectorAll('p'))) {
     const groups = Array.from(p.querySelectorAll('.phone-group'));
@@ -58,8 +62,8 @@ function groupContacts(doc: Document): void {
         cur = cur.previousSibling;
       }
       const labelText = labelNodes.map((n) => n.textContent ?? '').reverse().join('');
-      const m = labelText.match(NAME);
-      if (!m) continue; // telefono senza etichetta: lo lascio nel testo
+      const m = labelText.match(NAME_COLON) ?? labelText.match(NAME_BARE);
+      if (!m) continue; // telefono senza etichetta riconoscibile: lo lascio nel testo
 
       contacts.push({
         name: m[1].trim(),
