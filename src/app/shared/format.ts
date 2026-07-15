@@ -36,66 +36,79 @@ export function renderNewsBody(body: string): string {
   return doc.body.innerHTML;
 }
 
-// Divide i figli di un <p> in "righe" separate dai <br>.
-function splitByBr(p: HTMLElement): ChildNode[][] {
-  const lines: ChildNode[][] = [[]];
-  for (const node of Array.from(p.childNodes)) {
-    if (node.nodeName === 'BR') lines.push([]);
-    else lines[lines.length - 1].push(node);
-  }
-  return lines;
-}
-
-function isBlank(nodes: ChildNode[]): boolean {
-  return nodes.every((n) => n.nodeType === 3 && !(n.nodeValue ?? '').trim());
-}
-
-// Una riga è "contatto" se è esattamente: testo "Etichetta:" + un solo .phone-group.
-function parseContactLine(nodes: ChildNode[]): { label: string; group: Element } | null {
-  const meaningful = nodes.filter((n) => !(n.nodeType === 3 && !(n.nodeValue ?? '').trim()));
-  if (meaningful.length !== 2) return null;
-  const [first, second] = meaningful;
-  if (first.nodeType !== 3) return null;
-  const m = (first.nodeValue ?? '').match(/^\s*([^:]{1,24}):\s*$/);
-  if (!m) return null;
-  if (!(second instanceof Element) || !second.classList.contains('phone-group')) return null;
-  return { label: m[1].trim(), group: second };
-}
-
-// Trasforma i <p> che contengono righe di contatto in una griglia a colonne.
+// Trasforma le righe di contatto ("Nome: numero", anche col nome in grassetto
+// e più contatti sulla stessa riga) in una griglia allineata: nome | 📞 | 💬.
+// Per ogni telefono risale all'etichetta "Nome:" che lo precede. I telefoni
+// senza etichetta restano nel testo; l'eventuale intro resta come paragrafo.
 function groupContacts(doc: Document): void {
+  const NAME = /([\p{L}\p{M}.'’\- ]{1,30}?)\s*:\s*$/u;
+
   for (const p of Array.from(doc.body.querySelectorAll('p'))) {
-    const lines = splitByBr(p);
-    const parsed = lines.map(parseContactLine);
-    if (!parsed.some(Boolean)) continue; // nessun contatto: lascio il paragrafo com'è
+    const groups = Array.from(p.querySelectorAll('.phone-group'));
+    if (!groups.length) continue;
+
+    const contacts: { name: string; call: Element | null; wa: Element | null }[] = [];
+
+    for (const g of groups) {
+      // Risale a ritroso l'etichetta fino a <br>, un altro gruppo o l'inizio.
+      const labelNodes: ChildNode[] = [];
+      let cur = g.previousSibling;
+      while (cur && cur.nodeName !== 'BR' && !(cur instanceof Element && cur.classList.contains('phone-group'))) {
+        labelNodes.push(cur);
+        cur = cur.previousSibling;
+      }
+      const labelText = labelNodes.map((n) => n.textContent ?? '').reverse().join('');
+      const m = labelText.match(NAME);
+      if (!m) continue; // telefono senza etichetta: lo lascio nel testo
+
+      contacts.push({
+        name: m[1].trim(),
+        call: g.querySelector('.phone-call'),
+        wa: g.querySelector('.phone-wa'),
+      });
+
+      // Rimuove dal testo i nodi che compongono "Nome:" (dalla fine dell'etichetta).
+      let need = m[0].length;
+      for (const n of labelNodes) {
+        if (need <= 0) break;
+        const t = n.textContent ?? '';
+        if (t.length <= need) {
+          need -= t.length;
+          n.parentNode?.removeChild(n);
+        } else {
+          n.textContent = t.slice(0, t.length - need);
+          need = 0;
+        }
+      }
+      g.parentNode?.removeChild(g);
+    }
+
+    if (!contacts.length) continue;
 
     const grid = doc.createElement('div');
     grid.className = 'contact-grid';
+    for (const c of contacts) {
+      const name = doc.createElement('span');
+      name.className = 'c-name';
+      name.textContent = c.name;
+      const phone = doc.createElement('span');
+      phone.className = 'c-phone';
+      if (c.call) phone.appendChild(c.call);
+      const wa = doc.createElement('span');
+      wa.className = 'c-wa';
+      if (c.wa) wa.appendChild(c.wa);
+      grid.append(name, phone, wa);
+    }
 
-    lines.forEach((nodes, i) => {
-      const c = parsed[i];
-      if (c) {
-        const name = doc.createElement('span');
-        name.className = 'c-name';
-        name.textContent = c.label;
-        const phone = doc.createElement('span');
-        phone.className = 'c-phone';
-        const wa = doc.createElement('span');
-        wa.className = 'c-wa';
-        const call = c.group.querySelector('.phone-call');
-        const waLink = c.group.querySelector('.phone-wa');
-        if (call) phone.appendChild(call);
-        if (waLink) wa.appendChild(waLink);
-        grid.append(name, phone, wa);
-      } else if (!isBlank(nodes)) {
-        const full = doc.createElement('div');
-        full.className = 'c-full';
-        nodes.forEach((n) => full.appendChild(n));
-        grid.appendChild(full);
-      }
-    });
-
-    p.replaceWith(grid);
+    // L'eventuale intro resta come paragrafo sopra la griglia; pulisco code vuote.
+    p.after(grid);
+    while (
+      p.lastChild &&
+      (p.lastChild.nodeName === 'BR' || (p.lastChild.nodeType === 3 && !(p.lastChild.nodeValue ?? '').trim()))
+    ) {
+      p.removeChild(p.lastChild);
+    }
+    if (!(p.textContent ?? '').trim()) p.remove();
   }
 }
 
