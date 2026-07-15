@@ -356,7 +356,7 @@
   transition: all .12s ease;
 
   &:hover { border-color: var(--chip); }
-  &.on { background: var(--chip); border-color: var(--chip); color: #fff; }
+  &.on { background: var(--chip); border-color: rgba(0, 0, 0, 0.14); color: var(--chip-text, #fff); }
   &:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 }
 

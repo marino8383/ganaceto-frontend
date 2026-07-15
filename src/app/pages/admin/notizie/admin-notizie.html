@@ -25,6 +25,7 @@
               <button type="button" class="type-chip"
                 [class.on]="form.controls.tag.value === t.value"
                 [style.--chip]="t.color"
+                [style.--chip-text]="t.text"
                 [attr.aria-pressed]="form.controls.tag.value === t.value"
                 (click)="form.controls.tag.setValue(t.value)">
                 <span aria-hidden="true">{{ t.icon }}</span> {{ t.label }}
