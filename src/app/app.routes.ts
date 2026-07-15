@@ -32,4 +32,9 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin/notizie/admin-notizie').then((m) => m.AdminNotizie),
     canActivate: [adminGuard],
   },
+  {
+    path: 'admin/accessi',
+    loadComponent: () => import('./pages/admin/accessi/accessi').then((m) => m.AdminAccessi),
+    canActivate: [adminGuard],
+  },
 ];

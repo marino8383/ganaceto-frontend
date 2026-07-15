@@ -1,0 +1,60 @@
+<div class="page">
+  <a class="back" routerLink="/admin/notizie">‹ Amministrazione</a>
+  <div class="head">
+    <h1 class="ptitle">Accessi</h1>
+    <button class="refresh" type="button" (click)="load()" aria-label="Aggiorna">
+      <span class="material-icons" aria-hidden="true">refresh</span>
+    </button>
+  </div>
+
+  @if (loading()) {
+    <p class="muted">Caricamento…</p>
+  } @else if (error()) {
+    <p class="muted">Impossibile caricare i dati. <button class="linkbtn" (click)="load()">Riprova</button></p>
+  } @else if (data(); as d) {
+
+    <!-- Online ora -->
+    <div class="sec-h">🟢 Online ora <span class="pill accent">{{ d.onlineCount }}</span></div>
+    @if (d.online.length === 0) {
+      <p class="muted">Nessun utente online adesso.</p>
+    } @else {
+      <ul class="rows">
+        @for (u of d.online; track u.name + u.lastSeenAt) {
+          <li class="row">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="who">{{ u.name }}</span>
+            @if (u.role === 'Admin') { <span class="pill soft">Admin</span> }
+            <span class="meta">visto {{ u.lastSeenAt | date: 'HH:mm' }}</span>
+          </li>
+        }
+      </ul>
+    }
+
+    <!-- Accessi (login) per periodo -->
+    <div class="sec-h">Accessi</div>
+    <div class="stat3">
+      <div class="box"><div class="n">{{ d.logins.today }}</div><div class="k">Oggi</div></div>
+      <div class="box"><div class="n">{{ d.logins.week }}</div><div class="k">7 giorni</div></div>
+      <div class="box"><div class="n">{{ d.logins.month }}</div><div class="k">30 giorni</div></div>
+    </div>
+    <p class="muted small">{{ d.registered }} utenti registrati in totale · un accesso è contato una volta al giorno per utente.</p>
+
+    <!-- Log accessi -->
+    <div class="sec-h">Log accessi (login / logout)</div>
+    @if (d.log.length === 0) {
+      <p class="muted">Nessun accesso registrato.</p>
+    } @else {
+      <ul class="rows">
+        @for (l of d.log; track $index) {
+          <li class="row">
+            <span class="badge" [class.login]="l.action === 'Login'" [class.logout]="l.action === 'Logout'">
+              {{ l.action === 'Login' ? 'login' : 'logout' }}
+            </span>
+            <span class="who">{{ l.user }}</span>
+            <span class="meta">{{ l.device || '—' }} · {{ l.at | date: 'dd/MM HH:mm' }}</span>
+          </li>
+        }
+      </ul>
+    }
+  }
+</div>

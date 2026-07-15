@@ -47,16 +47,16 @@ export class Shell {
   ];
   readonly tabs = computed(() => this.allTabs.filter((t) => !t.authOnly || this.isLogged()));
 
-  // indicatore "online ora" verosimile (di notte ~0, di giorno oscilla 4-6, sera 5-7)
-  readonly online = signal(4);
+  // utenti online ora (reale, dal backend via heartbeat/online-count)
+  readonly online = this.auth.online;
 
   // fumetto "N utenti online ora!" al tocco del pallino
   readonly onlineTip = signal(false);
   private tipTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
-    this.tickOnline();
-    const onlineTimer = setInterval(() => this.tickOnline(), 16000);
+    this.auth.refreshOnline();
+    const presenceTimer = setInterval(() => this.auth.refreshOnline(), 30000);
 
     // aggiorna il contatore notifiche al login e periodicamente
     effect(() => {
@@ -78,6 +78,7 @@ export class Shell {
     // reattività: ricontrolla notifiche e aggiornamenti quando l'app torna in primo piano
     const onVisible = () => {
       if (document.visibilityState !== 'visible') return;
+      this.auth.refreshOnline();
       if (this.isLogged()) this.notifiche.refreshCount();
       if (this.swUpdate.isEnabled) this.swUpdate.checkForUpdate().catch(() => {});
     };
@@ -85,7 +86,7 @@ export class Shell {
     window.addEventListener('focus', onVisible);
 
     inject(DestroyRef).onDestroy(() => {
-      clearInterval(onlineTimer);
+      clearInterval(presenceTimer);
       clearInterval(notifTimer);
       clearTimeout(this.tipTimer);
       document.removeEventListener('visibilitychange', onVisible);
@@ -111,13 +112,5 @@ export class Shell {
 
   openNotifiche(): void {
     this.bottomSheet.open(NotificheSheet);
-  }
-
-  private tickOnline(): void {
-    const h = new Date().getHours();
-    const base = h < 7 || h >= 23 ? 0 : h < 19 ? 5 : 6;
-    const target = base === 0 ? 0 : Math.max(2, base + Math.round(Math.random() * 2 - 1));
-    const cur = this.online();
-    this.online.set(cur < target ? cur + 1 : cur > target ? cur - 1 : cur);
   }
 }
