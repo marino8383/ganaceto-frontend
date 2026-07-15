@@ -169,7 +169,7 @@ export class LinkPreview implements OnInit {
     // Enti locali prima (spesso condivisi via Facebook/sito): riconosco dal nome
     if (/comune\.modena\.it/.test(u)) return 'comune-modena';
     if (/solierese/.test(u)) return 'solierese';
-    if (/villanova|4ville|pol4ville|quattroville/.test(u)) return 'villanova';
+    if (/villanova|quattroville|pol4ville|4[\s_-]?ville/.test(u)) return 'villanova';
     // Piattaforme
     if (/t\.me|telegram\./.test(u)) return 'telegram';
     if (/facebook\.|fb\.me|fb\.watch/.test(u)) return 'facebook';
