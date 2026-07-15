@@ -1,7 +1,12 @@
 <div class="sheet">
   <div class="sheet-head">
     <strong>Notifiche</strong>
-    <button class="close-x" type="button" (click)="chiudi()" aria-label="Chiudi">✕</button>
+    <div class="head-actions">
+      @if (notifiche.list().length > 0) {
+        <button class="clear-all" type="button" (click)="svuota()">Svuota tutto</button>
+      }
+      <button class="close-x" type="button" (click)="chiudi()" aria-label="Chiudi">✕</button>
+    </div>
   </div>
 
   @if (notifiche.list().length === 0) {
@@ -16,6 +21,7 @@
             @if (n.body) { <p class="sub">{{ n.body }}</p> }
             <time class="when" [attr.datetime]="n.createdAt">{{ n.createdAt | date: 'dd/MM HH:mm' }}</time>
           </div>
+          <button class="del" type="button" (click)="elimina(n, $event)" aria-label="Elimina notifica" title="Elimina">🗑</button>
           @if (n.link) { <span class="chev" aria-hidden="true">›</span> }
         </li>
       }

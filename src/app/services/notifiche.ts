@@ -63,6 +63,32 @@ export class Notifiche {
     });
   }
 
+  // Elimina una singola notifica (ottimistico: la tolgo subito dalla lista).
+  remove(id: number): void {
+    const before = this._list();
+    const removed = before.find((n) => n.id === id);
+    this._list.set(before.filter((n) => n.id !== id));
+    if (removed && !removed.read) {
+      const next = Math.max(0, this.unread() - 1);
+      this.unread.set(next);
+      this.syncBadge(next);
+    }
+    this.http.delete(`${this.base}/api/notifications/${id}`).subscribe({
+      error: () => this._list.set(before), // ripristino in caso di errore
+    });
+  }
+
+  // Svuota tutte le notifiche dell'utente.
+  clearAll(): void {
+    const before = this._list();
+    this._list.set([]);
+    this.unread.set(0);
+    this.syncBadge(0);
+    this.http.delete(`${this.base}/api/notifications`).subscribe({
+      error: () => this._list.set(before),
+    });
+  }
+
   reset(): void {
     this._list.set([]);
     this.unread.set(0);

@@ -38,6 +38,15 @@ export class NotificheSheet implements OnInit {
     if (n.link) this.router.navigateByUrl(n.link);
   }
 
+  elimina(n: Notifica, event: Event): void {
+    event.stopPropagation();
+    this.notifiche.remove(n.id);
+  }
+
+  svuota(): void {
+    this.notifiche.clearAll();
+  }
+
   chiudi(): void {
     this.ref.dismiss();
   }
