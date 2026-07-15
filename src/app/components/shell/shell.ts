@@ -50,10 +50,6 @@ export class Shell {
   // indicatore "online ora" verosimile (di notte ~0, di giorno oscilla 4-6, sera 5-7)
   readonly online = signal(4);
 
-  // splash d'apertura: solo nel browser e una volta per sessione.
-  // Nell'app installata (standalone) NON lo mostriamo: c'è già quello del sistema.
-  readonly splashVisible = signal(!this.install.installed() && !sessionStorage.getItem('ganaceto_splash'));
-
   // fumetto "N utenti online ora!" al tocco del pallino
   readonly onlineTip = signal(false);
   private tipTimer: ReturnType<typeof setTimeout> | undefined;
@@ -61,11 +57,6 @@ export class Shell {
   constructor() {
     this.tickOnline();
     const onlineTimer = setInterval(() => this.tickOnline(), 16000);
-    let splashTimer: ReturnType<typeof setTimeout> | undefined;
-    if (this.splashVisible()) {
-      sessionStorage.setItem('ganaceto_splash', '1');
-      splashTimer = setTimeout(() => this.splashVisible.set(false), 1400);
-    }
 
     // aggiorna il contatore notifiche al login e periodicamente
     effect(() => {
@@ -96,7 +87,6 @@ export class Shell {
     inject(DestroyRef).onDestroy(() => {
       clearInterval(onlineTimer);
       clearInterval(notifTimer);
-      clearTimeout(splashTimer);
       clearTimeout(this.tipTimer);
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onVisible);
@@ -121,10 +111,6 @@ export class Shell {
 
   openNotifiche(): void {
     this.bottomSheet.open(NotificheSheet);
-  }
-
-  hideSplash(): void {
-    this.splashVisible.set(false);
   }
 
   private tickOnline(): void {

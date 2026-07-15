@@ -8,14 +8,66 @@
     <meta name="theme-color" content="#e8dcc8" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- Schermate d'avvio iOS: il wordmark su sfondo caldo (#f4efe8) invece del bianco -->
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1290x2796.png" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1179x2556.png" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1284x2778.png" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1170x2532.png" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1125x2436.png" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2688.png" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-828x1792.png" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-1242x2208.png" media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+    <link rel="apple-touch-startup-image" href="splash/apple-splash-750x1334.png" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
     <link rel="icon" type="image/png" href="logo-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      /* Splash d'apertura: disegnato subito, prima ancora che Angular parta.
+         Sfondo uguale al background_color del manifest → nessuno stacco con
+         lo splash di sistema (che mostra l'icona centrata sullo stesso sfondo). */
+      #boot-splash {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        padding: 32px; background: #f4efe8;
+        transition: opacity .35s ease;
+      }
+      #boot-splash img { max-width: 90%; max-height: 230px; object-fit: contain; }
+      #boot-splash.hide { opacity: 0; pointer-events: none; }
+    </style>
   </head>
   <body>
     <app-root></app-root>
+    <div id="boot-splash">
+      <img src="logo-wordmark.png" width="458" height="170" alt="Insieme per Ganaceto" />
+    </div>
+    <script>
+      (function () {
+        var s = document.getElementById('boot-splash');
+        if (!s) return;
+        var standalone =
+          window.matchMedia('(display-mode: standalone)').matches ||
+          window.navigator.standalone === true;
+        // Nel browser: una volta per sessione. Nell'app installata: a ogni apertura.
+        if (!standalone && sessionStorage.getItem('ganaceto_splash')) {
+          s.parentNode && s.parentNode.removeChild(s);
+          return;
+        }
+        sessionStorage.setItem('ganaceto_splash', '1');
+        var hidden = false;
+        function hide() {
+          if (hidden) return;
+          hidden = true;
+          s.classList.add('hide');
+          setTimeout(function () { s.parentNode && s.parentNode.removeChild(s); }, 400);
+        }
+        s.addEventListener('click', hide);
+        setTimeout(hide, 1800);
+      })();
+    </script>
   </body>
 </html>

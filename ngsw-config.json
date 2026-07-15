@@ -24,6 +24,7 @@
         "files": [
           "/media/**",
           "/*.png",
+          "/splash/*.png",
           "/*.svg",
           "/*.webp",
           "/*.woff2"
