@@ -85,10 +85,15 @@ export class Shell {
     this.ambient.set(this.hourlyTarget());
     const ambientTimer = setInterval(() => this.tickAmbient(), 16000);
 
-    // aggiorna il contatore notifiche al login e periodicamente
+    // aggiorna il contatore notifiche al login e periodicamente;
+    // al login ripara anche l'iscrizione push (endpoint ruotati/spariti)
     effect(() => {
-      if (this.isLogged()) this.notifiche.refreshCount();
-      else this.notifiche.reset();
+      if (this.isLogged()) {
+        this.notifiche.refreshCount();
+        void this.push.sync();
+      } else {
+        this.notifiche.reset();
+      }
     });
     const notifTimer = setInterval(() => {
       if (this.isLogged()) this.notifiche.refreshCount();
