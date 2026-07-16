@@ -270,9 +270,10 @@ export class Bacheca implements OnInit {
   }
 
   // Alla PRIMA risposta in un thread non seguito propone di attivare la
-  // campanella. La domanda è una tantum per thread (ricordata sul dispositivo),
-  // qualunque sia la risposta.
+  // campanella con una barretta inline nella card. La proposta è una tantum
+  // per thread (ricordata sul dispositivo), qualunque sia la risposta.
   private static readonly FOLLOW_ASKED_KEY = 'ganaceto_follow_asked';
+  readonly followOffer = signal<number | null>(null); // id del thread con la proposta aperta
 
   private maybeOfferFollow(parentId: number): void {
     const msg = this.messaggi().find((m) => m.id === parentId);
@@ -294,9 +295,16 @@ export class Bacheca implements OnInit {
       /* storage pieno o non disponibile: al massimo richiederà */
     }
 
-    if (confirm('🔔 Vuoi ricevere una notifica quando qualcuno risponde a questa conversazione?')) {
-      this.api.follow(parentId).subscribe({ next: () => this.api.setFollowing(parentId, true) });
-    }
+    this.followOffer.set(parentId);
+  }
+
+  acceptFollowOffer(parentId: number): void {
+    this.followOffer.set(null);
+    this.api.follow(parentId).subscribe({ next: () => this.api.setFollowing(parentId, true) });
+  }
+
+  declineFollowOffer(): void {
+    this.followOffer.set(null);
   }
 
   // Link condiviso nel testo del post → anteprima. Riconosce anche URL senza

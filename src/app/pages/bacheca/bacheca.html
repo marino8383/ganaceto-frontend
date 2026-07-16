@@ -229,6 +229,17 @@
             </div>
           </form>
         }
+        <!-- Proposta di seguire il thread (dopo la prima risposta) -->
+        @if (followOffer() === msg.id) {
+          <div class="follow-offer">
+            <span class="material-icons fo-icon" aria-hidden="true">notifications</span>
+            <span class="fo-text">Vuoi essere avvisato quando qualcuno risponde qui?</span>
+            <span class="fo-actions">
+              <button class="fo-btn" type="button" (click)="acceptFollowOffer(msg.id)">Sì, avvisami</button>
+              <button class="fo-link" type="button" (click)="declineFollowOffer()">No grazie</button>
+            </span>
+          </div>
+        }
         </div><!-- /messaggio-card -->
       </li>
     }
