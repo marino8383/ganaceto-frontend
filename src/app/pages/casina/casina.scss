@@ -75,6 +75,11 @@
 
   .num { font-size: 0.85rem; font-weight: 600; line-height: 1; }
   .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .oggi {
+    font-size: 0.6rem; font-weight: 800; font-style: italic;
+    letter-spacing: 0.5px; color: var(--accent);
+    transform: rotate(-10deg); display: inline-block;
+  }
   .tag {
     font-size: 0.58rem; line-height: 1.15; font-weight: 600; text-align: center;
     max-width: 100%; overflow: hidden; display: -webkit-box;
@@ -85,9 +90,10 @@
   &.out { visibility: hidden; }
   &.past { opacity: 0.38; cursor: default; }
   &.today .num { color: var(--accent); }
-  &.today { border-color: var(--accent); }
+  &.today { border: 2px solid var(--accent); } /* contorno spesso per oggi */
   &.free { background: var(--accent-soft); }
-  &.busy { background: var(--primary-container); }
+  /* prenotazione privata confermata: rosso pastello */
+  &.busy { background: var(--danger-soft); .tag { color: var(--danger); } }
   &.pending-cell { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 4px, var(--primary-container) 4px, var(--primary-container) 8px); }
   /* eventi pubblici in giallo caldo: il verde resta solo alle giornate libere */
   &.public-cell { background: #f9edc9; .tag { color: #8a6100; } }
@@ -101,7 +107,7 @@
   span { display: inline-flex; align-items: center; gap: 5px; }
   .sw { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
   .free-sw { background: var(--accent-soft); border: 1px solid var(--accent); }
-  .busy-sw { background: var(--primary-container); }
+  .busy-sw { background: var(--danger-soft); }
   .pend-sw { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 3px, var(--primary-container) 3px, var(--primary-container) 6px); }
   .pub-sw { background: #f9edc9; border: 1px solid #e3c98a; }
 }

@@ -83,6 +83,8 @@
           <span class="num">{{ c.day }}</span>
           @if (c.label; as l) {
             <span class="tag">{{ l }}</span>
+          } @else if (c.isToday) {
+            <span class="oggi">OGGI</span>
           } @else if (c.bookable) {
             <span class="dot" aria-hidden="true"></span>
           }
