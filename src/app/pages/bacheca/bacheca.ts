@@ -260,12 +260,43 @@ export class Bacheca implements OnInit {
           this.replyForm.reset({ testo: '' });
           this.sending.set(false);
           this.load();
+          this.maybeOfferFollow(parentId);
         },
         error: () => {
           this.error.set("Errore durante l'invio. Riprova.");
           this.sending.set(false);
         },
       });
+  }
+
+  // Alla PRIMA risposta in un thread non seguito propone di attivare la
+  // campanella. La domanda è una tantum per thread (ricordata sul dispositivo),
+  // qualunque sia la risposta.
+  private static readonly FOLLOW_ASKED_KEY = 'ganaceto_follow_asked';
+
+  private maybeOfferFollow(parentId: number): void {
+    const msg = this.messaggi().find((m) => m.id === parentId);
+    if (!msg || msg.isFollowing) return;
+
+    let asked: number[] = [];
+    try {
+      asked = JSON.parse(localStorage.getItem(Bacheca.FOLLOW_ASKED_KEY) ?? '[]') as number[];
+    } catch {
+      /* valore corrotto: riparte da zero */
+    }
+    if (asked.includes(parentId)) return;
+    try {
+      localStorage.setItem(
+        Bacheca.FOLLOW_ASKED_KEY,
+        JSON.stringify([...asked, parentId].slice(-200)),
+      );
+    } catch {
+      /* storage pieno o non disponibile: al massimo richiederà */
+    }
+
+    if (confirm('🔔 Vuoi ricevere una notifica quando qualcuno risponde a questa conversazione?')) {
+      this.api.follow(parentId).subscribe({ next: () => this.api.setFollowing(parentId, true) });
+    }
   }
 
   // Link condiviso nel testo del post → anteprima. Riconosce anche URL senza
