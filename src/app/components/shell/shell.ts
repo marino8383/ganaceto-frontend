@@ -7,6 +7,7 @@ import { SwUpdate } from '@angular/service-worker';
 import { Auth } from '../../services/auth';
 import { Notifiche } from '../../services/notifiche';
 import { InstallService } from '../../services/install';
+import { Push } from '../../services/push';
 
 interface Tab { path: string; label: string; icon: string; authOnly?: boolean; }
 
@@ -22,6 +23,7 @@ export class Shell {
   private readonly auth = inject(Auth);
   private readonly notifiche = inject(Notifiche);
   readonly install = inject(InstallService);
+  readonly push = inject(Push);
   private readonly swUpdate = inject(SwUpdate);
 
   // nuova versione dell'app pronta (mostra la barra "Aggiorna")
@@ -57,6 +59,22 @@ export class Shell {
   // fumetto "N utenti online ora!" al tocco del pallino
   readonly onlineTip = signal(false);
   private tipTimer: ReturnType<typeof setTimeout> | undefined;
+
+  // Invito ad attivare le notifiche (soft prompt): appare da loggati se non
+  // iscritti e mai rifiutato. Il prompt NATIVO parte solo al tocco su "Attiva":
+  // così chi negherebbe tocca la ✕ e non brucia il permesso a livello browser.
+  private readonly notifPromptDismissed = signal(
+    localStorage.getItem('ganaceto_notif_prompt_dismissed') === '1',
+  );
+  readonly showNotifPrompt = computed(
+    () =>
+      this.isLogged() &&
+      this.push.supported &&
+      this.push.known() &&
+      !this.push.subscribed() &&
+      !this.notifPromptDismissed() &&
+      Notification.permission !== 'denied',
+  );
 
   constructor() {
     this.auth.refreshOnline();
@@ -118,6 +136,16 @@ export class Shell {
 
   applyUpdate(): void {
     this.swUpdate.activateUpdate().then(() => document.location.reload());
+  }
+
+  async enableNotifiche(): Promise<void> {
+    const ok = await this.push.enable();
+    if (!ok) this.dismissNotifPrompt(); // permesso negato o errore: non insistere
+  }
+
+  dismissNotifPrompt(): void {
+    this.notifPromptDismissed.set(true);
+    localStorage.setItem('ganaceto_notif_prompt_dismissed', '1');
   }
 
   toggleOnlineTip(): void {

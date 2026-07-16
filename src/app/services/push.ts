@@ -16,10 +16,16 @@ export class Push {
   readonly supported = this.swPush.isEnabled && typeof Notification !== 'undefined';
   readonly subscribed = signal(false);
   readonly busy = signal(false);
+  // true quando lo stato dell'iscrizione è noto (evita che l'invito ad attivare
+  // le notifiche lampeggi a chi è già iscritto)
+  readonly known = signal(false);
 
   constructor() {
     if (this.swPush.isEnabled) {
-      this.swPush.subscription.subscribe((sub) => this.subscribed.set(!!sub));
+      this.swPush.subscription.subscribe((sub) => {
+        this.subscribed.set(!!sub);
+        this.known.set(true);
+      });
     }
   }
 

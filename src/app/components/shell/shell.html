@@ -47,6 +47,20 @@
     </div>
   }
 
+  <!-- Invito ad attivare le notifiche (soft prompt, priorità alla barra installa) -->
+  @if (showNotifPrompt() && !install.show) {
+    <div class="install-bar notif-bar">
+      <span class="ib-icon material-icons" aria-hidden="true">notifications</span>
+      <span class="ib-text">Vuoi ricevere gli avvisi del paese?</span>
+      <button class="ib-btn" type="button" [disabled]="push.busy()" (click)="enableNotifiche()">
+        {{ push.busy() ? 'Attendere…' : 'Attiva' }}
+      </button>
+      <button class="ib-x" type="button" (click)="dismissNotifPrompt()" aria-label="No grazie">
+        <span class="material-icons" aria-hidden="true">close</span>
+      </button>
+    </div>
+  }
+
   <!-- Barra installa app (PWA) -->
   @if (install.show) {
     <div class="install-bar">
