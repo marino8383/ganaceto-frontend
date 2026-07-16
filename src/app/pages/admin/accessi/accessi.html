@@ -13,8 +13,9 @@
     <p class="muted">Impossibile caricare i dati. <button class="linkbtn" (click)="load()">Riprova</button></p>
   } @else if (data(); as d) {
 
-    <!-- Online ora -->
-    <div class="sec-h">🟢 Online ora <span class="pill accent">{{ d.onlineRegistered + d.onlineGuests }}</span></div>
+    <!-- Online ora: solo i registrati, per combaciare con l'elenco nomi sotto
+         (gli ospiti anonimi restano nelle caselle Ospiti/Totale) -->
+    <div class="sec-h">🟢 Online ora <span class="pill accent">{{ d.onlineRegistered }}</span></div>
     <div class="stat3">
       <div class="box"><div class="n">{{ d.onlineRegistered }}</div><div class="k">Registrati</div></div>
       <div class="box"><div class="n">{{ d.onlineGuests }}</div><div class="k">Ospiti</div></div>
