@@ -28,20 +28,25 @@
 .p-who, .p-notes { color: var(--muted); font-size: 0.8rem; }
 .p-actions { display: flex; gap: 8px; }
 
-/* ── in programma ── */
+/* ── agenda della settimana ── */
 .upcoming {
   background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
   padding: 14px; margin-bottom: 16px;
   h2 { font-size: 1rem; margin: 0 0 10px; }
 }
-.up-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.up-item {
-  display: flex; align-items: baseline; gap: 10px; font-size: 0.88rem;
-  padding: 6px 8px; border-radius: 10px; background: var(--accent-soft);
+.wk-day { margin-bottom: 10px; &:last-child { margin-bottom: 0; } }
+.wk-head {
+  font-weight: 700; font-size: 0.82rem; color: var(--text);
+  text-transform: capitalize; margin-bottom: 4px;
 }
-.up-date { color: var(--accent); font-weight: 700; font-size: 0.78rem; min-width: 76px; text-transform: capitalize; }
-.up-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-.up-time { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+.wk-row {
+  display: flex; align-items: baseline; gap: 10px; font-size: 0.88rem;
+  padding: 6px 10px; border-radius: 10px; background: var(--event-soft, #f9edc9);
+  margin-bottom: 4px;
+  &.priv { background: var(--primary-container); .wk-time { color: var(--primary); } }
+}
+.wk-time { font-weight: 700; font-size: 0.78rem; color: #8a6100; min-width: 92px; white-space: nowrap; }
+.wk-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 
 /* ── calendario ── */
 .cal {
@@ -84,7 +89,8 @@
   &.free { background: var(--accent-soft); }
   &.busy { background: var(--primary-container); }
   &.pending-cell { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 4px, var(--primary-container) 4px, var(--primary-container) 8px); }
-  &.public-cell { background: var(--accent-soft); .tag { color: var(--accent); } }
+  /* eventi pubblici in giallo caldo: il verde resta solo alle giornate libere */
+  &.public-cell { background: #f9edc9; .tag { color: #8a6100; } }
   &.mine { outline: 2px solid var(--primary); }
   &.sel { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-container); }
 }
@@ -97,7 +103,7 @@
   .free-sw { background: var(--accent-soft); border: 1px solid var(--accent); }
   .busy-sw { background: var(--primary-container); }
   .pend-sw { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 3px, var(--primary-container) 3px, var(--primary-container) 6px); }
-  .pub-sw { background: var(--accent-soft); border: 1px solid var(--line); }
+  .pub-sw { background: #f9edc9; border: 1px solid #e3c98a; }
 }
 
 /* ── pannello giorno ── */
@@ -118,6 +124,7 @@
   .hint { font-size: 0.78rem; color: var(--muted); margin: 0; }
 }
 .time-row { display: flex; gap: 10px; label { flex: 1; } }
+.form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
 
 .del-inline {
   border: none; background: transparent; cursor: pointer; padding: 2px;

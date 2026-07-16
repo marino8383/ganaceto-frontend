@@ -120,8 +120,25 @@ export class Casina implements OnInit {
     return cells;
   });
 
-  // prossimi eventi pubblici (lista "In programma")
-  readonly upcoming = signal<CalendarBooking[]>([]);
+  // agenda della settimana: i prossimi 7 giorni con gli slot orari
+  readonly weekBookings = signal<CalendarBooking[]>([]);
+  readonly weekDays = computed(() => {
+    const map = new Map<string, CalendarBooking[]>();
+    for (const b of this.weekBookings()) {
+      const k = dayKey(new Date(b.slotStart));
+      const list = map.get(k) ?? [];
+      list.push(b);
+      map.set(k, list);
+    }
+    const out: { key: string; bookings: CalendarBooking[] }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + i);
+      const key = dayKey(d);
+      const list = (map.get(key) ?? []).sort((a, b) => a.slotStart.localeCompare(b.slotStart));
+      if (list.length > 0) out.push({ key, bookings: list });
+    }
+    return out;
+  });
 
   // giorno selezionato (dettaglio o form di prenotazione)
   readonly selected = signal<DayCell | null>(null);
@@ -154,22 +171,17 @@ export class Casina implements OnInit {
   ngOnInit(): void {
     this.api.loadConfig();
     this.loadMonth();
-    this.loadUpcoming();
+    this.loadWeek();
     if (this.auth.isLoggedIn) this.loadMine();
     if (this.auth.isAdmin) this.loadPending();
   }
 
-  // prossimi eventi pubblici nei 60 giorni (mostra le attività ricorrenti)
-  loadUpcoming(): void {
+  // slot dei prossimi 7 giorni (agenda "questa settimana")
+  loadWeek(): void {
     const from = dayKey(this.today);
-    const to = dayKey(new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 60));
+    const to = dayKey(new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 7));
     this.api.calendar(from, to).subscribe({
-      next: (items) =>
-        this.upcoming.set(
-          items
-            .filter((b) => b.type === 'Public' && b.status === 'Confirmed')
-            .slice(0, 8),
-        ),
+      next: (items) => this.weekBookings.set(items.filter((b) => b.status === 'Confirmed')),
     });
   }
 
@@ -197,9 +209,13 @@ export class Casina implements OnInit {
     });
   }
 
+  // il form di richiesta appare solo dopo il tocco sul pulsante dedicato
+  readonly bookingFormOpen = signal(false);
+
   selectDay(cell: DayCell): void {
     this.error.set(null);
     this.success.set(null);
+    this.bookingFormOpen.set(false);
     if (!cell.inMonth) return;
     if (this.selected()?.key === cell.key) { this.selected.set(null); return; }
     this.selected.set(cell);
@@ -228,6 +244,7 @@ export class Casina implements OnInit {
         next: () => {
           this.sending.set(false);
           this.selected.set(null);
+          this.bookingFormOpen.set(false);
           this.bookForm.patchValue({ title: '', notes: '' });
           this.success.set(
             this.auth.isAdmin
@@ -335,7 +352,7 @@ export class Casina implements OnInit {
               : `Create ${r.created} date.`,
           );
           this.loadMonth();
-          this.loadUpcoming();
+          this.loadWeek();
         },
         error: () => { this.sending.set(false); this.error.set('Inserimento non riuscito.'); },
       });
@@ -347,7 +364,7 @@ export class Casina implements OnInit {
     );
     if (!series) return;
     this.api.delete(b.id, false).subscribe({
-      next: () => { this.selected.set(null); this.loadMonth(); this.loadUpcoming(); },
+      next: () => { this.selected.set(null); this.loadMonth(); this.loadWeek(); },
       error: () => this.error.set('Eliminazione non riuscita.'),
     });
   }

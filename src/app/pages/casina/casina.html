@@ -33,19 +33,21 @@
     </section>
   }
 
-  <!-- Prossimi eventi pubblici -->
-  @if (upcoming().length > 0) {
+  <!-- Agenda della settimana: i prossimi 7 giorni con gli slot orari -->
+  @if (weekDays().length > 0) {
     <section class="upcoming">
-      <h2>In programma alla Casina</h2>
-      <ul class="up-list">
-        @for (u of upcoming(); track u.id) {
-          <li class="up-item">
-            <span class="up-date">{{ u.slotStart | date: 'EEE d MMM' }}</span>
-            <strong class="up-title">{{ u.title }}</strong>
-            <span class="up-time">{{ slotLabel(u) }}</span>
-          </li>
-        }
-      </ul>
+      <h2>Questa settimana alla Casina</h2>
+      @for (d of weekDays(); track d.key) {
+        <div class="wk-day">
+          <div class="wk-head">{{ d.key | date: 'EEEE d MMMM' }}</div>
+          @for (b of d.bookings; track b.id) {
+            <div class="wk-row" [class.priv]="b.type === 'Private'">
+              <span class="wk-time">{{ slotLabel(b) }}</span>
+              <span class="wk-title">{{ b.title ?? 'Occupato' }}</span>
+            </div>
+          }
+        </div>
+      }
     </section>
   }
 
@@ -120,10 +122,14 @@
       }
 
       @if (day.bookable) {
-        @if (auth.isLoggedIn) {
+        @if (auth.isLoggedIn && !bookingFormOpen()) {
           @if (day.bookings.length > 0) {
             <p class="d-line muted">La giornata è ancora richiedibile: basta non sovrapporsi agli orari qui sopra.</p>
           }
+          <button class="btn-ok" type="button" (click)="bookingFormOpen.set(true)">
+            Richiedi questa giornata
+          </button>
+        } @else if (auth.isLoggedIn) {
           <form [formGroup]="bookForm" (ngSubmit)="invia()" novalidate>
             <label>
               Occasione
@@ -150,9 +156,12 @@
               <textarea formControlName="notes" rows="2" maxlength="300"></textarea>
             </label>
             <p class="hint">La giornata resta tua: una sola prenotazione privata al giorno. L'associazione conferma con una notifica.</p>
-            <button class="btn-ok" type="submit" [disabled]="bookForm.invalid || sending()">
-              {{ sending() ? 'Invio…' : 'Invia richiesta' }}
-            </button>
+            <div class="form-actions">
+              <button class="linkbtn" type="button" (click)="bookingFormOpen.set(false)">Annulla</button>
+              <button class="btn-ok" type="submit" [disabled]="bookForm.invalid || sending()">
+                {{ sending() ? 'Invio…' : 'Invia richiesta' }}
+              </button>
+            </div>
           </form>
         } @else {
           <p class="d-line">Giornata richiedibile! <strong>Accedi</strong> per prenotare la Casina.</p>
