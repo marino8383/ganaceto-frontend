@@ -87,7 +87,7 @@
         <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
         <p class="d-line">
           <strong>{{ b.title ?? 'Occupato' }}</strong>
-          · {{ b.slotStart | date: 'HH:mm' }}–{{ b.slotEnd | date: 'HH:mm' }}
+          · {{ slotLabel(b) }}
           @if (b.status === 'Pending') { <span class="chip wait">in attesa di conferma</span> }
           @if (b.isMine) { <span class="chip mine-chip">tua</span> }
         </p>

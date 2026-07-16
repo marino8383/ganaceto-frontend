@@ -74,6 +74,7 @@ export class AdminNotizie implements OnInit {
     referenceDate: [''],
     startTime: [''],
     endTime: [''],
+    atCasina: [false],
     coverSize: ['medium' as CoverSize],
     externalUrl: [''],
   });
@@ -104,7 +105,7 @@ export class AdminNotizie implements OnInit {
   openCreate(): void {
     this.form.reset({
       title: '', body: '', tag: 'Evento', isVisible: true, expandedInHome: false,
-      referenceDate: '', startTime: '', endTime: '', coverSize: 'medium', externalUrl: '',
+      referenceDate: '', startTime: '', endTime: '', atCasina: false, coverSize: 'medium', externalUrl: '',
     });
     this.cover.set(null);
     this.editingId.set(null);
@@ -122,6 +123,7 @@ export class AdminNotizie implements OnInit {
       referenceDate: item.referenceDate ?? '',
       startTime: item.startTime ?? '',
       endTime: item.endTime ?? '',
+      atCasina: item.atCasina,
       coverSize: item.coverSize ?? 'medium',
       externalUrl: item.externalUrl ?? '',
     });
@@ -245,6 +247,7 @@ export class AdminNotizie implements OnInit {
       referenceDate: raw.referenceDate || null,
       startTime: raw.startTime || null,
       endTime: raw.endTime || null,
+      atCasina: raw.atCasina && !!raw.referenceDate,
       coverSize: raw.coverSize,
       externalUrl: raw.externalUrl.trim() || null,
     };
@@ -257,8 +260,12 @@ export class AdminNotizie implements OnInit {
       this.formMode.set('closed');
       this.saving.set(false);
     };
-    const fail = () => {
-      this.error.set('Errore durante il salvataggio.');
+    const fail = (err: unknown) => {
+      // 409 = conflitto calendario Casina: mostra il messaggio del server
+      const msg = (err as { status?: number; error?: unknown })?.status === 409
+        ? String((err as { error?: unknown }).error)
+        : 'Errore durante il salvataggio.';
+      this.error.set(msg);
       this.saving.set(false);
     };
 
@@ -289,6 +296,7 @@ export class AdminNotizie implements OnInit {
         referenceDate: item.referenceDate,
         startTime: item.startTime,
         endTime: item.endTime,
+        atCasina: item.atCasina,
         coverSize: item.coverSize,
         externalUrl: item.externalUrl,
       })

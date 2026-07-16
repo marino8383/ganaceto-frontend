@@ -223,6 +223,20 @@ export class Casina implements OnInit {
     });
   }
 
+  // "10:00–13:00", "dalle 20:00" (senza fine) o "tutto il giorno"
+  // (gli eventi-notizia senza fascia oraria coprono 00:00–23:59)
+  slotLabel(b: { slotStart: string; slotEnd: string }): string {
+    const s = new Date(b.slotStart);
+    const e = new Date(b.slotEnd);
+    const openStart = s.getHours() === 0 && s.getMinutes() === 0;
+    const openEnd = e.getHours() === 23 && e.getMinutes() === 59;
+    const fmt = (d: Date) =>
+      `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    if (openStart && openEnd) return 'tutto il giorno';
+    if (openEnd) return `dalle ${fmt(s)}`;
+    return `${fmt(s)}–${fmt(e)}`;
+  }
+
   statusLabel(s: MyBooking['status']): string {
     switch (s) {
       case 'Pending': return 'In attesa';
