@@ -26,14 +26,6 @@
       </button>
     }
 
-    <a class="admin-link" routerLink="/condividi" (click)="close()">
-      <span class="material-icons" aria-hidden="true">ios_share</span>
-      <span class="link-lbl">
-        Pubblica un link copiato
-        <small>da Facebook, Instagram, giornali…</small>
-      </span>
-    </a>
-
     @if (auth.isAdmin) {
       <a class="admin-link" routerLink="/admin/notizie" (click)="close()">
         <span class="material-icons" aria-hidden="true">edit</span> Gestisci notizie
