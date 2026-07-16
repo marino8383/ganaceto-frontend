@@ -106,8 +106,16 @@
               <input formControlName="title" maxlength="80" placeholder="es. Compleanno di Marta" />
             </label>
             <div class="time-row">
-              <label>Dalle <input type="time" formControlName="from" /></label>
-              <label>Alle <input type="time" formControlName="to" /></label>
+              <label>Dalle
+                <select formControlName="from">
+                  @for (t of timeOptions; track t) { <option [value]="t">{{ t }}</option> }
+                </select>
+              </label>
+              <label>Alle
+                <select formControlName="to">
+                  @for (t of timeOptions; track t) { <option [value]="t">{{ t }}</option> }
+                </select>
+              </label>
             </div>
             <label>
               Telefono
@@ -178,8 +186,16 @@
         <form class="admin-form" [formGroup]="adminForm" (ngSubmit)="adminInvia()" novalidate>
           <label>Data <input type="date" formControlName="date" /></label>
           <div class="time-row">
-            <label>Dalle <input type="time" formControlName="from" /></label>
-            <label>Alle <input type="time" formControlName="to" /></label>
+            <label>Dalle
+              <select formControlName="from">
+                @for (t of timeOptions; track t) { <option [value]="t">{{ t }}</option> }
+              </select>
+            </label>
+            <label>Alle
+              <select formControlName="to">
+                @for (t of timeOptions; track t) { <option [value]="t">{{ t }}</option> }
+              </select>
+            </label>
           </div>
           <label>Titolo <input formControlName="title" maxlength="80" placeholder="es. Tombola degli anziani" /></label>
           <label class="check">

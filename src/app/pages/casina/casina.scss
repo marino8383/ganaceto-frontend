@@ -95,7 +95,7 @@
 
   form { display: flex; flex-direction: column; gap: 10px; }
   label { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
-  input, textarea {
+  input, textarea, select {
     border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px;
     font: inherit; font-size: 0.92rem; background: var(--surface-2); color: var(--text);
     &:focus { outline: 2px solid var(--accent); }
@@ -131,7 +131,7 @@
 .admin-form {
   display: flex; flex-direction: column; gap: 10px; margin-top: 12px;
   label { display: flex; flex-direction: column; gap: 4px; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
-  input { border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font: inherit; background: var(--surface-2); }
+  input, select { border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; font: inherit; background: var(--surface-2); }
   .check { flex-direction: row; align-items: center; gap: 8px; }
   .weeks { width: 70px; }
 }
