@@ -10,6 +10,31 @@ html {
   ));
 }
 
+// ── Material Icons auto-ospitate (niente CDN: senza rete le icone sparivano
+//    su alcuni telefoni; ora il file è in public/ e finisce in cache ngsw) ──
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block; // meglio niente che il testo "edit" al posto dell'icona
+  src: url('/material-icons.woff2') format('woff2');
+}
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
 // ── Design tokens "Insieme per Ganaceto" (dal mockup) ────────────────────
 :root {
   --bg:#f4efe8; --surface:#fffdf9; --surface-2:#f7f1e8;
