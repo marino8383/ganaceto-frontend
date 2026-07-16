@@ -28,6 +28,21 @@
 .p-who, .p-notes { color: var(--muted); font-size: 0.8rem; }
 .p-actions { display: flex; gap: 8px; }
 
+/* ── in programma ── */
+.upcoming {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 14px; margin-bottom: 16px;
+  h2 { font-size: 1rem; margin: 0 0 10px; }
+}
+.up-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.up-item {
+  display: flex; align-items: baseline; gap: 10px; font-size: 0.88rem;
+  padding: 6px 8px; border-radius: 10px; background: var(--accent-soft);
+}
+.up-date { color: var(--accent); font-weight: 700; font-size: 0.78rem; min-width: 76px; text-transform: capitalize; }
+.up-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.up-time { color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
+
 /* ── calendario ── */
 .cal {
   background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
@@ -103,6 +118,13 @@
   .hint { font-size: 0.78rem; color: var(--muted); margin: 0; }
 }
 .time-row { display: flex; gap: 10px; label { flex: 1; } }
+
+.del-inline {
+  border: none; background: transparent; cursor: pointer; padding: 2px;
+  color: var(--danger); vertical-align: middle;
+  .material-icons { font-size: 18px; }
+  &:hover { opacity: 0.75; }
+}
 
 .chip {
   font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 999px;

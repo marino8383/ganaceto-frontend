@@ -15,8 +15,11 @@ interface DayCell {
   inMonth: boolean;
   isPast: boolean;
   isToday: boolean;
-  bookable: boolean; // regola weekend + non passato + libero
-  booking: CalendarBooking | null; // primo (unico) evento della giornata
+  bookable: boolean; // regola weekend + non passato + nessun privato quel giorno
+  bookings: CalendarBooking[]; // eventi della giornata (i pubblici possono essere più di uno)
+  kind: 'free' | 'private' | 'privatePending' | 'public';
+  label: string | null; // titolo, "Occupato" o "N eventi"
+  mine: boolean;
 }
 
 const MONTHS = [
@@ -64,10 +67,16 @@ export class Casina implements OnInit {
 
   readonly mode = this.api.mode;
 
-  // prenotazioni per giorno (un evento al giorno)
+  // prenotazioni per giorno: un privato al massimo, pubblici anche più di uno
   private readonly byDay = computed(() => {
-    const map = new Map<string, CalendarBooking>();
-    for (const b of this.bookings()) map.set(dayKey(new Date(b.slotStart)), b);
+    const map = new Map<string, CalendarBooking[]>();
+    for (const b of this.bookings()) {
+      const k = dayKey(new Date(b.slotStart));
+      const list = map.get(k) ?? [];
+      list.push(b);
+      map.set(k, list);
+    }
+    for (const list of map.values()) list.sort((a, b) => a.slotStart.localeCompare(b.slotStart));
     return map;
   });
 
@@ -86,19 +95,33 @@ export class Casina implements OnInit {
       const key = dayKey(d);
       const isPast = key < todayKey;
       const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-      const booking = map.get(key) ?? null;
+      const list = map.get(key) ?? [];
+      const priv = list.find((b) => b.type === 'Private');
       cells.push({
         key,
         day: d.getDate(),
         inMonth: d.getMonth() === m,
         isPast,
         isToday: key === todayKey,
-        bookable: !isPast && booking === null && (!weekendOnly || isWeekend),
-        booking,
+        // gli eventi pubblici non "consumano" la giornata: si può ancora chiedere
+        // (il server rifiuta solo se gli orari si sovrappongono)
+        bookable: !isPast && !priv && (!weekendOnly || isWeekend),
+        bookings: list,
+        kind: priv
+          ? (priv.status === 'Pending' ? 'privatePending' : 'private')
+          : list.length > 0 ? 'public' : 'free',
+        label:
+          list.length === 0 ? null
+          : list.length === 1 ? (list[0].title ?? 'Occupato')
+          : `${list.length} eventi`,
+        mine: list.some((b) => b.isMine),
       });
     }
     return cells;
   });
+
+  // prossimi eventi pubblici (lista "In programma")
+  readonly upcoming = signal<CalendarBooking[]>([]);
 
   // giorno selezionato (dettaglio o form di prenotazione)
   readonly selected = signal<DayCell | null>(null);
@@ -131,8 +154,23 @@ export class Casina implements OnInit {
   ngOnInit(): void {
     this.api.loadConfig();
     this.loadMonth();
+    this.loadUpcoming();
     if (this.auth.isLoggedIn) this.loadMine();
     if (this.auth.isAdmin) this.loadPending();
+  }
+
+  // prossimi eventi pubblici nei 60 giorni (mostra le attività ricorrenti)
+  loadUpcoming(): void {
+    const from = dayKey(this.today);
+    const to = dayKey(new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate() + 60));
+    this.api.calendar(from, to).subscribe({
+      next: (items) =>
+        this.upcoming.set(
+          items
+            .filter((b) => b.type === 'Public' && b.status === 'Confirmed')
+            .slice(0, 8),
+        ),
+    });
   }
 
   // --- calendario ---
@@ -297,6 +335,7 @@ export class Casina implements OnInit {
               : `Create ${r.created} date.`,
           );
           this.loadMonth();
+          this.loadUpcoming();
         },
         error: () => { this.sending.set(false); this.error.set('Inserimento non riuscito.'); },
       });
@@ -308,7 +347,7 @@ export class Casina implements OnInit {
     );
     if (!series) return;
     this.api.delete(b.id, false).subscribe({
-      next: () => { this.selected.set(null); this.loadMonth(); },
+      next: () => { this.selected.set(null); this.loadMonth(); this.loadUpcoming(); },
       error: () => this.error.set('Eliminazione non riuscita.'),
     });
   }

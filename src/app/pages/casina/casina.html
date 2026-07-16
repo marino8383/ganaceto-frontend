@@ -33,6 +33,22 @@
     </section>
   }
 
+  <!-- Prossimi eventi pubblici -->
+  @if (upcoming().length > 0) {
+    <section class="upcoming">
+      <h2>In programma alla Casina</h2>
+      <ul class="up-list">
+        @for (u of upcoming(); track u.id) {
+          <li class="up-item">
+            <span class="up-date">{{ u.slotStart | date: 'EEE d MMM' }}</span>
+            <strong class="up-title">{{ u.title }}</strong>
+            <span class="up-time">{{ slotLabel(u) }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
   <!-- Calendario -->
   <section class="cal">
     <div class="cal-head">
@@ -54,17 +70,17 @@
           [class.out]="!c.inMonth"
           [class.past]="c.isPast"
           [class.today]="c.isToday"
-          [class.free]="c.bookable"
-          [class.busy]="c.booking !== null"
-          [class.pending-cell]="c.booking?.status === 'Pending'"
-          [class.public-cell]="c.booking?.type === 'Public'"
-          [class.mine]="c.booking?.isMine"
+          [class.free]="c.kind === 'free' && c.bookable"
+          [class.busy]="c.kind === 'private'"
+          [class.pending-cell]="c.kind === 'privatePending'"
+          [class.public-cell]="c.kind === 'public'"
+          [class.mine]="c.mine"
           [class.sel]="selected()?.key === c.key"
           [disabled]="!c.inMonth"
           (click)="selectDay(c)">
           <span class="num">{{ c.day }}</span>
-          @if (c.booking; as b) {
-            <span class="tag">{{ b.title ?? 'Occupato' }}</span>
+          @if (c.label; as l) {
+            <span class="tag">{{ l }}</span>
           } @else if (c.bookable) {
             <span class="dot" aria-hidden="true"></span>
           }
@@ -83,23 +99,31 @@
   <!-- Dettaglio giorno selezionato -->
   @if (selected(); as day) {
     <section class="day-panel">
-      @if (day.booking; as b) {
-        <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
+      <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
+
+      <!-- eventi della giornata (i pubblici possono essere più di uno) -->
+      @for (b of day.bookings; track b.id) {
         <p class="d-line">
           <strong>{{ b.title ?? 'Occupato' }}</strong>
           · {{ slotLabel(b) }}
           @if (b.status === 'Pending') { <span class="chip wait">in attesa di conferma</span> }
           @if (b.isMine) { <span class="chip mine-chip">tua</span> }
+          @if (auth.isAdmin && b.requesterName && b.type === 'Private') {
+            <span class="muted"> — {{ b.requesterName }}</span>
+          }
+          @if (auth.isAdmin) {
+            <button class="del-inline" type="button" (click)="elimina(b)" title="Elimina">
+              <span class="material-icons" aria-hidden="true">delete_outline</span>
+            </button>
+          }
         </p>
-        @if (auth.isAdmin && b.requesterName) {
-          <p class="d-line muted">Richiesta di {{ b.requesterName }}</p>
-        }
-        @if (auth.isAdmin) {
-          <button class="btn-no" type="button" (click)="elimina(b)">Elimina prenotazione</button>
-        }
-      } @else if (day.bookable) {
+      }
+
+      @if (day.bookable) {
         @if (auth.isLoggedIn) {
-          <h3>Richiedi la Casina · {{ day.key | date: 'EEEE d MMMM' }}</h3>
+          @if (day.bookings.length > 0) {
+            <p class="d-line muted">La giornata è ancora richiedibile: basta non sovrapporsi agli orari qui sopra.</p>
+          }
           <form [formGroup]="bookForm" (ngSubmit)="invia()" novalidate>
             <label>
               Occasione
@@ -125,17 +149,15 @@
               Note (facoltative)
               <textarea formControlName="notes" rows="2" maxlength="300"></textarea>
             </label>
-            <p class="hint">La giornata resta tua: un solo evento al giorno. L'associazione conferma con una notifica.</p>
+            <p class="hint">La giornata resta tua: una sola prenotazione privata al giorno. L'associazione conferma con una notifica.</p>
             <button class="btn-ok" type="submit" [disabled]="bookForm.invalid || sending()">
               {{ sending() ? 'Invio…' : 'Invia richiesta' }}
             </button>
           </form>
         } @else {
-          <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
-          <p class="d-line">Giornata libera! <strong>Accedi</strong> per richiedere la Casina.</p>
+          <p class="d-line">Giornata richiedibile! <strong>Accedi</strong> per prenotare la Casina.</p>
         }
-      } @else {
-        <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
+      } @else if (day.bookings.length === 0) {
         <p class="d-line muted">
           {{ day.isPast ? 'Giornata passata.' : 'Non prenotabile: al momento la Casina si richiede nel weekend.' }}
         </p>

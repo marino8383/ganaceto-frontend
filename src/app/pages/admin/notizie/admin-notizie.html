@@ -53,11 +53,17 @@
         <div class="field field-times">
           <div>
             <label for="f-start">Dalle</label>
-            <input id="f-start" type="time" formControlName="startTime" />
+            <select id="f-start" formControlName="startTime">
+              <option value="">—</option>
+              @for (t of timeOptions; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
           </div>
           <div>
             <label for="f-end">Alle</label>
-            <input id="f-end" type="time" formControlName="endTime" />
+            <select id="f-end" formControlName="endTime">
+              <option value="">—</option>
+              @for (t of timeOptions; track t) { <option [value]="t">{{ t }}</option> }
+            </select>
           </div>
           <span class="field-hint">Fascia oraria facoltativa</span>
         </div>

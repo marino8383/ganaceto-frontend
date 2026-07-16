@@ -79,6 +79,13 @@ export class AdminNotizie implements OnInit {
     externalUrl: [''],
   });
 
+  // orari proposti a quarti d'ora (07:00 → 23:45), vuoto = non indicato
+  readonly timeOptions: string[] = Array.from({ length: 17 * 4 }, (_, i) => {
+    const h = 7 + Math.floor(i / 4);
+    const m = (i % 4) * 15;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  });
+
   ngOnInit(): void {
     this.newsService.loadAdminNotizie();
 
