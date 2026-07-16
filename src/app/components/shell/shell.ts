@@ -76,6 +76,26 @@ export class Shell {
       Notification.permission !== 'denied',
   );
 
+  // Consiglio una-tantum per Android: le push della PWA passano da Chrome, e se
+  // Chrome ha la batteria "ottimizzata" arrivano in ritardo (anche 15-20 min in
+  // doze). Non possiamo aprire le impostazioni da una pagina web: solo guidare.
+  private readonly batteryTipDismissed = signal(
+    localStorage.getItem('ganaceto_battery_tip_dismissed') === '1',
+  );
+  private readonly isAndroid = /android/i.test(navigator.userAgent);
+  readonly showBatteryTip = computed(
+    () =>
+      this.isAndroid &&
+      this.isLogged() &&
+      this.push.subscribed() &&
+      !this.batteryTipDismissed(),
+  );
+
+  dismissBatteryTip(): void {
+    this.batteryTipDismissed.set(true);
+    localStorage.setItem('ganaceto_battery_tip_dismissed', '1');
+  }
+
   constructor() {
     this.auth.refreshOnline();
     this.auth.trackGuestVisitOnce();

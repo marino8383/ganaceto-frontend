@@ -61,6 +61,17 @@
     </div>
   }
 
+  <!-- Consiglio batteria Chrome (Android, una tantum, solo iscritti alle push) -->
+  @if (showBatteryTip() && !showNotifPrompt() && !install.show) {
+    <div class="install-bar">
+      <span class="ib-icon material-icons" aria-hidden="true">battery_charging_full</span>
+      <span class="ib-text">
+        Notifiche sempre puntuali: <b>Impostazioni&nbsp;→ App&nbsp;→ Chrome&nbsp;→ Batteria&nbsp;→ Senza restrizioni</b>
+      </span>
+      <button class="ib-btn" type="button" (click)="dismissBatteryTip()">Ho capito</button>
+    </div>
+  }
+
   <!-- Barra installa app (PWA) -->
   @if (install.show) {
     <div class="install-bar">
