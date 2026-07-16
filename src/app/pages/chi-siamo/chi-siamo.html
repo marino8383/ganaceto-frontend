@@ -57,6 +57,9 @@
   </section>
 
   <footer class="build">
-    versione <code>{{ build.commit }}</code> · aggiornata il {{ build.time | date: 'dd/MM/yyyy HH:mm' }}@if (apiCommit(); as api) { · api <code>{{ api }}</code> }
+    @if (apiVersion(); as api) {
+      <div>BE: <code>{{ api.commit }}</code> · {{ api.builtAt | date: 'dd/MM/yyyy HH:mm' }}</div>
+    }
+    <div>FE: <code>{{ build.commit }}</code> · {{ build.time | date: 'dd/MM/yyyy HH:mm' }}</div>
   </footer>
 </div>

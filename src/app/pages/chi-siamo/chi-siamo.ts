@@ -16,13 +16,13 @@ export class ChiSiamo {
   private readonly sanitizer = inject(DomSanitizer);
   readonly build = BUILD_INFO;
 
-  // versione del backend in esecuzione (commit del deploy su Render)
-  readonly apiCommit = signal<string | null>(null);
+  // versione del backend in esecuzione (commit e data del deploy su Render)
+  readonly apiVersion = signal<{ commit: string; builtAt: string } | null>(null);
 
   constructor() {
     inject(HttpClient)
-      .get<{ commit: string }>(`${inject(API_BASE_URL)}/api/version`)
-      .subscribe({ next: (v) => this.apiCommit.set(v.commit) }); // se fallisce resta nascosta
+      .get<{ commit: string; builtAt: string }>(`${inject(API_BASE_URL)}/api/version`)
+      .subscribe({ next: (v) => this.apiVersion.set(v) }); // se fallisce resta nascosta
   }
 
   readonly address = 'Via Ferruccio Cambi, 11 — 41123 Ganaceto (MO)';
