@@ -1,4 +1,4 @@
-﻿import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
 import { API_BASE_URL } from '../app.config';
@@ -16,16 +16,16 @@ export interface NewsType {
   accent: string; // colore della striscia laterale della card
 }
 
-// Classificazione delle notizie â€” unica fonte: per aggiungere/rinominare un
+// Classificazione delle notizie — unica fonte: per aggiungere/rinominare un
 // tipo basta modificare questa lista (e l'enum NewsTag lato backend).
 export const NEWS_TYPES: NewsType[] = [
-  { value: 'Evento', label: 'Evento', icon: 'ðŸ—“ï¸', color: '#5e7d4f', text: '#fff', accent: '#5e7d4f' },
-  { value: 'Avviso', label: 'Avviso', icon: 'âš ï¸', color: '#b3402f', text: '#fff', accent: '#b3402f' },
-  { value: 'ControlloVicinato', label: 'Controllo del vicinato', icon: 'ðŸ‘ï¸', color: '#47617e', text: '#fff', accent: '#47617e' },
-  { value: 'Info', label: 'Info', icon: 'â„¹ï¸', color: '#7a5a3a', text: '#fff', accent: '#7a5a3a' },
-  { value: 'Comune', label: 'Comune', icon: 'ðŸ›ï¸', color: '#8a7a5a', text: '#fff', accent: '#8a7a5a' },
+  { value: 'Evento', label: 'Evento', icon: '🗓️', color: '#5e7d4f', text: '#fff', accent: '#5e7d4f' },
+  { value: 'Avviso', label: 'Avviso', icon: '⚠️', color: '#b3402f', text: '#fff', accent: '#b3402f' },
+  { value: 'ControlloVicinato', label: 'Controllo del vicinato', icon: '👁️', color: '#47617e', text: '#fff', accent: '#47617e' },
+  { value: 'Info', label: 'Info', icon: 'ℹ️', color: '#7a5a3a', text: '#fff', accent: '#7a5a3a' },
+  { value: 'Comune', label: 'Comune', icon: '🏛️', color: '#8a7a5a', text: '#fff', accent: '#8a7a5a' },
   // News: pill bianca, ma la striscia della card usa il bordo neutro (niente striscia invisibile)
-  { value: 'News', label: 'News', icon: 'ðŸ“°', color: '#ffffff', text: '#1c1b17', accent: 'var(--line)' },
+  { value: 'News', label: 'News', icon: '📰', color: '#ffffff', text: '#1c1b17', accent: 'var(--line)' },
 ];
 
 const NEWS_TYPE_MAP = new Map(NEWS_TYPES.map((t) => [t.value, t]));
@@ -97,9 +97,9 @@ export function externalChannelLabel(url: string): string {
   return 'Apri il post originale';
 }
 
-/** Fascia oraria leggibile: "9:00â€“10:00", "dalle 9:00", oppure "" */
+/** Fascia oraria leggibile: "9:00–10:00", "dalle 9:00", oppure "" */
 export function newsTimeRange(item: { startTime: string | null; endTime: string | null }): string {
-  if (item.startTime && item.endTime) return `${item.startTime}â€“${item.endTime}`;
+  if (item.startTime && item.endTime) return `${item.startTime}–${item.endTime}`;
   if (item.startTime) return `dalle ${item.startTime}`;
   if (item.endTime) return `fino alle ${item.endTime}`;
   return '';
@@ -125,7 +125,7 @@ export class News {
     }
   }
 
-  // cache in sessione delle anteprime link (il backend ha giÃ  la sua)
+  // cache in sessione delle anteprime link (il backend ha già la sua)
   private readonly previewCache = new Map<string, LinkPreview>();
 
   getLinkPreview(url: string): Observable<LinkPreview> {
