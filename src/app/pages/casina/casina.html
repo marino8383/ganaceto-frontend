@@ -1,1 +1,197 @@
-<p>casina works!</p>
+<div class="page">
+  <header class="page-head">
+    <h1>🏠 La Casina</h1>
+    <p class="sub">
+      Il calendario dello spazio dell'associazione: guarda le giornate libere e
+      manda la tua richiesta{{ mode() === 'weekend' ? ' (si prenota nel weekend)' : '' }}.
+    </p>
+  </header>
+
+  @if (success(); as s) { <p class="banner ok">{{ s }}</p> }
+  @if (error(); as e) { <p class="banner err">{{ e }}</p> }
+
+  <!-- Richieste in attesa (solo admin) -->
+  @if (auth.isAdmin && pending().length > 0) {
+    <section class="pending-box">
+      <h2>Richieste in attesa <span class="pill">{{ pending().length }}</span></h2>
+      <ul class="pending-list">
+        @for (p of pending(); track p.id) {
+          <li class="pending-item">
+            <div class="p-info">
+              <strong>{{ p.title }}</strong>
+              <span class="p-when">{{ p.slotStart | date: 'EEE d MMMM' }} · {{ p.slotStart | date: 'HH:mm' }}–{{ p.slotEnd | date: 'HH:mm' }}</span>
+              <span class="p-who">{{ p.requesterName }} · 📞 {{ p.phone }}</span>
+              @if (p.notes) { <span class="p-notes">{{ p.notes }}</span> }
+            </div>
+            <div class="p-actions">
+              <button class="btn-ok" type="button" (click)="approva(p)">Approva</button>
+              <button class="btn-no" type="button" (click)="rifiuta(p)">Rifiuta</button>
+            </div>
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <!-- Calendario -->
+  <section class="cal">
+    <div class="cal-head">
+      <button class="nav" type="button" (click)="prevMonth()" aria-label="Mese precedente">
+        <span class="material-icons" aria-hidden="true">chevron_left</span>
+      </button>
+      <h2 class="month">{{ monthLabel() }}</h2>
+      <button class="nav" type="button" (click)="nextMonth()" aria-label="Mese successivo">
+        <span class="material-icons" aria-hidden="true">chevron_right</span>
+      </button>
+    </div>
+
+    <div class="grid" role="grid" aria-label="Calendario prenotazioni">
+      @for (w of weekdays; track w) { <div class="wd">{{ w }}</div> }
+      @for (c of cells(); track c.key) {
+        <button
+          type="button"
+          class="cell"
+          [class.out]="!c.inMonth"
+          [class.past]="c.isPast"
+          [class.today]="c.isToday"
+          [class.free]="c.bookable"
+          [class.busy]="c.booking !== null"
+          [class.pending-cell]="c.booking?.status === 'Pending'"
+          [class.public-cell]="c.booking?.type === 'Public'"
+          [class.mine]="c.booking?.isMine"
+          [class.sel]="selected()?.key === c.key"
+          [disabled]="!c.inMonth"
+          (click)="selectDay(c)">
+          <span class="num">{{ c.day }}</span>
+          @if (c.booking; as b) {
+            <span class="tag">{{ b.title ?? 'Occupato' }}</span>
+          } @else if (c.bookable) {
+            <span class="dot" aria-hidden="true"></span>
+          }
+        </button>
+      }
+    </div>
+
+    <div class="legend">
+      <span><i class="sw free-sw"></i> Libero</span>
+      <span><i class="sw busy-sw"></i> Occupato</span>
+      <span><i class="sw pend-sw"></i> In attesa</span>
+      <span><i class="sw pub-sw"></i> Evento pubblico</span>
+    </div>
+  </section>
+
+  <!-- Dettaglio giorno selezionato -->
+  @if (selected(); as day) {
+    <section class="day-panel">
+      @if (day.booking; as b) {
+        <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
+        <p class="d-line">
+          <strong>{{ b.title ?? 'Occupato' }}</strong>
+          · {{ b.slotStart | date: 'HH:mm' }}–{{ b.slotEnd | date: 'HH:mm' }}
+          @if (b.status === 'Pending') { <span class="chip wait">in attesa di conferma</span> }
+          @if (b.isMine) { <span class="chip mine-chip">tua</span> }
+        </p>
+        @if (auth.isAdmin && b.requesterName) {
+          <p class="d-line muted">Richiesta di {{ b.requesterName }}</p>
+        }
+        @if (auth.isAdmin) {
+          <button class="btn-no" type="button" (click)="elimina(b)">Elimina prenotazione</button>
+        }
+      } @else if (day.bookable) {
+        @if (auth.isLoggedIn) {
+          <h3>Richiedi la Casina · {{ day.key | date: 'EEEE d MMMM' }}</h3>
+          <form [formGroup]="bookForm" (ngSubmit)="invia()" novalidate>
+            <label>
+              Occasione
+              <input formControlName="title" maxlength="80" placeholder="es. Compleanno di Marta" />
+            </label>
+            <div class="time-row">
+              <label>Dalle <input type="time" formControlName="from" /></label>
+              <label>Alle <input type="time" formControlName="to" /></label>
+            </div>
+            <label>
+              Telefono
+              <input formControlName="phone" type="tel" maxlength="30" placeholder="per essere ricontattato" />
+            </label>
+            <label>
+              Note (facoltative)
+              <textarea formControlName="notes" rows="2" maxlength="300"></textarea>
+            </label>
+            <p class="hint">La giornata resta tua: un solo evento al giorno. L'associazione conferma con una notifica.</p>
+            <button class="btn-ok" type="submit" [disabled]="bookForm.invalid || sending()">
+              {{ sending() ? 'Invio…' : 'Invia richiesta' }}
+            </button>
+          </form>
+        } @else {
+          <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
+          <p class="d-line">Giornata libera! <strong>Accedi</strong> per richiedere la Casina.</p>
+        }
+      } @else {
+        <h3>{{ day.key | date: 'EEEE d MMMM' }}</h3>
+        <p class="d-line muted">
+          {{ day.isPast ? 'Giornata passata.' : 'Non prenotabile: al momento la Casina si richiede nel weekend.' }}
+        </p>
+      }
+    </section>
+  }
+
+  <!-- Le mie prenotazioni -->
+  @if (auth.isLoggedIn && mine().length > 0) {
+    <section class="mine-box">
+      <h2>Le mie prenotazioni</h2>
+      <ul class="mine-list">
+        @for (b of mine(); track b.id) {
+          <li class="mine-item">
+            <div class="m-info">
+              <strong>{{ b.title }}</strong>
+              <span class="p-when">{{ b.slotStart | date: 'EEE d MMM' }} · {{ b.slotStart | date: 'HH:mm' }}–{{ b.slotEnd | date: 'HH:mm' }}</span>
+              @if (b.rejectionReason) { <span class="p-notes">Motivo: {{ b.rejectionReason }}</span> }
+            </div>
+            <span class="chip" [class.ok-chip]="b.status === 'Confirmed'"
+                  [class.wait]="b.status === 'Pending'"
+                  [class.no-chip]="b.status === 'Rejected' || b.status === 'CancelledByUser'">
+              {{ statusLabel(b.status) }}
+            </span>
+            @if (b.cancellableNow && (b.status === 'Pending' || b.status === 'Confirmed')) {
+              <button class="linkbtn" type="button" (click)="annulla(b)">Annulla</button>
+            }
+          </li>
+        }
+      </ul>
+    </section>
+  }
+
+  <!-- Strumenti admin -->
+  @if (auth.isAdmin) {
+    <section class="admin-box">
+      <h2>Strumenti admin</h2>
+      <div class="admin-row">
+        <button class="btn-ghost" type="button" (click)="adminFormOpen.set(!adminFormOpen())">
+          {{ adminFormOpen() ? 'Chiudi' : '+ Aggiungi evento / prenotazione' }}
+        </button>
+        <button class="btn-ghost" type="button" (click)="toggleMode()">
+          Prenotabile: {{ mode() === 'weekend' ? 'solo weekend' : 'tutti i giorni' }} · cambia
+        </button>
+      </div>
+
+      @if (adminFormOpen()) {
+        <form class="admin-form" [formGroup]="adminForm" (ngSubmit)="adminInvia()" novalidate>
+          <label>Data <input type="date" formControlName="date" /></label>
+          <div class="time-row">
+            <label>Dalle <input type="time" formControlName="from" /></label>
+            <label>Alle <input type="time" formControlName="to" /></label>
+          </div>
+          <label>Titolo <input formControlName="title" maxlength="80" placeholder="es. Tombola degli anziani" /></label>
+          <label class="check">
+            <input type="checkbox" formControlName="isPublic" />
+            Evento pubblico (titolo visibile a tutti)
+          </label>
+          <label>Ripeti per <input type="number" formControlName="repeatWeeks" min="1" max="52" class="weeks" /> settimana/e</label>
+          <button class="btn-ok" type="submit" [disabled]="adminForm.invalid || sending()">
+            {{ sending() ? 'Salvataggio…' : 'Salva' }}
+          </button>
+        </form>
+      }
+    </section>
+  }
+</div>
