@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { API_BASE_URL } from '../../app.config';
 import { BUILD_INFO } from '../../build-info';
 
 @Component({
@@ -13,6 +15,15 @@ import { BUILD_INFO } from '../../build-info';
 export class ChiSiamo {
   private readonly sanitizer = inject(DomSanitizer);
   readonly build = BUILD_INFO;
+
+  // versione del backend in esecuzione (commit del deploy su Render)
+  readonly apiCommit = signal<string | null>(null);
+
+  constructor() {
+    inject(HttpClient)
+      .get<{ commit: string }>(`${inject(API_BASE_URL)}/api/version`)
+      .subscribe({ next: (v) => this.apiCommit.set(v.commit) }); // se fallisce resta nascosta
+  }
 
   readonly address = 'Via Ferruccio Cambi, 11 — 41123 Ganaceto (MO)';
   readonly phoneDisplay = '331 590 0462';
